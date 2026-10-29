@@ -18,6 +18,21 @@ public class PlayerSpriteRenderer : MonoBehaviour
 
     private void LateUpdate()
     {
+        if (movement.swimming && !movement.grounded)
+        {
+            // swim cycle reusing the existing frames: stroke pose after a
+            // stroke, slow leg kicks with the run frames while gliding
+            run.enabled = false;
+
+            if (movement.stroking || run.sprites.Length == 0) {
+                spriteRenderer.sprite = jump;
+            } else {
+                spriteRenderer.sprite = run.sprites[Mathf.FloorToInt(Time.time * 5f) % run.sprites.Length];
+            }
+
+            return;
+        }
+
         run.enabled = movement.running;
 
         if (movement.jumping) {

@@ -46,7 +46,30 @@ public static class ChiptuneSynth
             (Rest, 0.5f), (65, 0.25f), (69, 0.25f),
             (Rest, 0.5f), (68, 0.5f))));
 
+    // 6 second loop in 3/4: gentle waltz with an oom-pah-pah bass
+    public static AudioClip WaterTheme => Get("Water Theme", () => Mix(
+        Voice(Wave.Square, 0.07f,
+            (77, 0.5f), (76, 0.25f),
+            (74, 0.75f),
+            (72, 0.5f), (74, 0.25f),
+            (76, 0.75f),
+            (77, 0.5f), (79, 0.25f),
+            (81, 0.5f), (79, 0.25f),
+            (77, 0.25f), (76, 0.25f), (74, 0.25f),
+            (72, 0.75f)),
+        Voice(Wave.Triangle, 0.3f,
+            (41, 0.25f), (48, 0.25f), (48, 0.25f),
+            (46, 0.25f), (53, 0.25f), (53, 0.25f),
+            (36, 0.25f), (43, 0.25f), (43, 0.25f),
+            (41, 0.25f), (48, 0.25f), (48, 0.25f),
+            (38, 0.25f), (45, 0.25f), (45, 0.25f),
+            (41, 0.25f), (48, 0.25f), (48, 0.25f),
+            (36, 0.25f), (43, 0.25f), (43, 0.25f),
+            (41, 0.25f), (48, 0.25f), (48, 0.25f))));
+
     // sound effects
+
+    public static AudioClip Swim => Get("Swim", () => Mix(Sweep(Wave.Triangle, 0.35f, 58f, 66f, 0.09f)));
 
     public static AudioClip Jump => Get("Jump", () => Mix(Sweep(Wave.Square, 0.12f, 62f, 79f, 0.2f)));
 

@@ -5,8 +5,11 @@ using UnityEngine;
 [RequireComponent(typeof(AudioSource))]
 public class LevelMusic : MonoBehaviour
 {
-    // optional, the synthesized underground theme is used when left empty
+    public enum Theme { Underground, Water }
+
+    // optional, the synthesized theme is used when left empty
     public AudioClip music;
+    public Theme theme = Theme.Underground;
     public float volume = 0.6f;
 
     private AudioSource source;
@@ -14,7 +17,13 @@ public class LevelMusic : MonoBehaviour
     private void Start()
     {
         source = GetComponent<AudioSource>();
-        source.clip = music != null ? music : ChiptuneSynth.UndergroundTheme;
+
+        if (music != null) {
+            source.clip = music;
+        } else {
+            source.clip = theme == Theme.Water ? ChiptuneSynth.WaterTheme : ChiptuneSynth.UndergroundTheme;
+        }
+
         source.loop = true;
         source.volume = volume;
         source.Play();

@@ -22,6 +22,17 @@ public class PlayerMovement : MonoBehaviour
     public bool sliding => (inputAxis > 0f && velocity.x < 0f) || (inputAxis < 0f && velocity.x > 0f);
     public bool falling => velocity.y < 0f && !grounded;
 
+    // swimming, enabled by a WaterZone (land movement is unchanged)
+    public float swimSpeed = 3.5f;
+    public float swimStroke = 6f;
+    public float swimGravity = -9f;
+    public float maxSinkSpeed = -3f;
+
+    public bool swimming { get; private set; }
+    public bool stroking => Time.time - lastStrokeTime < 0.3f;
+    private float swimCeiling;
+    private float lastStrokeTime = -1f;
+
     private void Awake()
     {
         camera = Camera.main;
@@ -47,6 +58,12 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
+        if (swimming)
+        {
+            SwimMovement();
+            return;
+        }
+
         HorizontalMovement();
 
         grounded = rigidbody.Raycast(Vector2.down);
@@ -115,6 +132,58 @@ public class PlayerMovement : MonoBehaviour
         // apply gravity and terminal velocity
         velocity.y += gravity * multiplier * Time.deltaTime;
         velocity.y = Mathf.Max(velocity.y, gravity / 2f);
+    }
+
+    public void SetSwimming(bool swimming, float ceiling = 0f)
+    {
+        this.swimming = swimming;
+        swimCeiling = ceiling;
+        jumping = false;
+
+        // enter the water sinking gently instead of keeping the fall speed
+        if (swimming) {
+            velocity.y = Mathf.Max(velocity.y, maxSinkSpeed);
+        }
+    }
+
+    private void SwimMovement()
+    {
+        // slower horizontal movement with water drag
+        inputAxis = Input.GetAxis("Horizontal");
+        velocity.x = Mathf.MoveTowards(velocity.x, inputAxis * swimSpeed, swimSpeed * 2f * Time.deltaTime);
+
+        if (rigidbody.Raycast(Vector2.right * velocity.x)) {
+            velocity.x = 0f;
+        }
+
+        if (velocity.x > 0f) {
+            transform.eulerAngles = Vector3.zero;
+        } else if (velocity.x < 0f) {
+            transform.eulerAngles = new Vector3(0f, 180f, 0f);
+        }
+
+        grounded = rigidbody.Raycast(Vector2.down);
+
+        // every press of jump is a swim stroke, even in mid water
+        if (Input.GetButtonDown("Jump"))
+        {
+            velocity.y = swimStroke;
+            lastStrokeTime = Time.time;
+            Sfx.Play(ChiptuneSynth.Swim);
+        }
+
+        // reduced gravity with a slow terminal sinking speed (buoyancy)
+        velocity.y += swimGravity * Time.deltaTime;
+        velocity.y = Mathf.Max(velocity.y, maxSinkSpeed);
+
+        if (grounded) {
+            velocity.y = Mathf.Max(velocity.y, 0f);
+        }
+
+        // cannot swim above the water surface
+        if (rigidbody.position.y >= swimCeiling) {
+            velocity.y = Mathf.Min(velocity.y, 0f);
+        }
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
