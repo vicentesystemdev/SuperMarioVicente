@@ -104,6 +104,15 @@ public class GameManager : MonoBehaviour
 
     public void LoadLevel(int world, int stage)
     {
+        // levels that are not built yet (or not in Build Profiles) return
+        // to 1-1 keeping lives and coins instead of failing to load
+        if (!Application.CanStreamedLevelBeLoaded($"{world}-{stage}"))
+        {
+            Debug.LogWarning($"[GameManager] El nivel {world}-{stage} aún no existe o no está en Build Profiles. Se vuelve a 1-1 conservando vidas y monedas.");
+            world = 1;
+            stage = 1;
+        }
+
         this.world = world;
         this.stage = stage;
 

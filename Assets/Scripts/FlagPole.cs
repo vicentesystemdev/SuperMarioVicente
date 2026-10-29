@@ -14,6 +14,14 @@ public class FlagPole : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
+            Sfx.Play(ChiptuneSynth.Flag);
+
+            LevelMusic music = FindAnyObjectByType<LevelMusic>();
+
+            if (music != null) {
+                music.Stop();
+            }
+
             StartCoroutine(MoveTo(flag, poleBottom.position));
             StartCoroutine(LevelCompleteSequence(other.transform));
         }

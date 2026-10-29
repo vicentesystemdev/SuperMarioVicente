@@ -67,6 +67,8 @@ public class Player : MonoBehaviour
         capsuleCollider.size = new Vector2(1f, 1f);
         capsuleCollider.offset = new Vector2(0f, 0f);
 
+        Sfx.Play(ChiptuneSynth.PipeWarp);
+
         StartCoroutine(ScaleAnimation());
     }
 

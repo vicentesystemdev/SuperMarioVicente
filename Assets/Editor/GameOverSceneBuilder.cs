@@ -72,6 +72,7 @@ public static class GameOverSceneBuilder
         }
 
         EditorBuildSettings.scenes = scenes.ToArray();
+        AssetDatabase.SaveAssets();
 
         foreach (EditorBuildSettingsScene s in scenes) {
             Debug.Log($"[GameOverSceneBuilder] Build scene: {s.path} (enabled: {s.enabled})");

@@ -53,6 +53,7 @@ public class Koopa : MonoBehaviour
     private void EnterShell()
     {
         shelled = true;
+        Sfx.Play(ChiptuneSynth.Stomp);
 
         GetComponent<SpriteRenderer>().sprite = shellSprite;
         GetComponent<AnimatedSprite>().enabled = false;
@@ -62,6 +63,7 @@ public class Koopa : MonoBehaviour
     private void PushShell(Vector2 direction)
     {
         pushed = true;
+        Sfx.Play(ChiptuneSynth.Kick);
 
         GetComponent<Rigidbody2D>().isKinematic = false;
 

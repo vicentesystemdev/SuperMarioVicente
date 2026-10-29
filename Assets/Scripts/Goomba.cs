@@ -29,6 +29,8 @@ public class Goomba : MonoBehaviour
 
     private void Flatten()
     {
+        Sfx.Play(ChiptuneSynth.Stomp);
+
         GetComponent<Collider2D>().enabled = false;
         GetComponent<EntityMovement>().enabled = false;
         GetComponent<AnimatedSprite>().enabled = false;

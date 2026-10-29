@@ -25,18 +25,22 @@ public class PowerUp : MonoBehaviour
         {
             case Type.Coin:
                 GameManager.Instance.AddCoin();
+                Sfx.Play(ChiptuneSynth.Coin);
                 break;
 
             case Type.ExtraLife:
                 GameManager.Instance.AddLife();
+                Sfx.Play(ChiptuneSynth.OneUp);
                 break;
 
             case Type.MagicMushroom:
                 player.GetComponent<Player>().Grow();
+                Sfx.Play(ChiptuneSynth.PowerUpCollect);
                 break;
 
             case Type.Starpower:
                 player.GetComponent<Player>().Starpower();
+                Sfx.Play(ChiptuneSynth.PowerUpCollect);
                 break;
         }
 
