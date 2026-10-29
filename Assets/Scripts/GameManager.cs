@@ -6,6 +6,7 @@ public class GameManager : MonoBehaviour
 {
     public const int StartingLives = 3;
     public const string GameOverScene = "GameOver";
+    public const string VictoryScene = "Victory";
 
     public static GameManager Instance { get; private set; }
 
@@ -22,6 +23,12 @@ public class GameManager : MonoBehaviour
     private AudioSource audioSource;
     private ScreenFader fader;
     private Coroutine resetRoutine;
+
+    // checkpoint of the current level, kept while the level is reloaded
+    // after a death and cleared when another level or a new game starts
+    private bool hasCheckpoint;
+    private Vector3 checkpoint;
+    private string checkpointLevel;
 
     private void Awake()
     {
@@ -84,6 +91,7 @@ public class GameManager : MonoBehaviour
         }
 
         resetting = false;
+        hasCheckpoint = false;
         lives = StartingLives;
         coins = 0;
 
@@ -116,7 +124,37 @@ public class GameManager : MonoBehaviour
         this.world = world;
         this.stage = stage;
 
+        if (checkpointLevel != $"{world}-{stage}") {
+            hasCheckpoint = false;
+        }
+
         SceneManager.LoadScene($"{world}-{stage}");
+    }
+
+    public void SetCheckpoint(Vector3 position)
+    {
+        hasCheckpoint = true;
+        checkpoint = position;
+        checkpointLevel = SceneManager.GetActiveScene().name;
+    }
+
+    public bool TryGetCheckpoint(out Vector3 position)
+    {
+        position = checkpoint;
+        return hasCheckpoint && checkpointLevel == SceneManager.GetActiveScene().name;
+    }
+
+    public void Victory()
+    {
+        Debug.Log($"[GameManager] ¡Victoria! Monedas: {coins}, vidas: {lives}");
+        hasCheckpoint = false;
+
+        if (Application.CanStreamedLevelBeLoaded(VictoryScene)) {
+            SceneManager.LoadScene(VictoryScene);
+        } else {
+            Debug.LogError($"[GameManager] La escena '{VictoryScene}' no está en Build Profiles. Ejecuta Tools > Super Mario > Crear Castillo de Bowser 8-4.");
+            NewGame();
+        }
     }
 
     public void NextLevel()

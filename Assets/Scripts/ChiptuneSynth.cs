@@ -67,7 +67,79 @@ public static class ChiptuneSynth
             (36, 0.25f), (43, 0.25f), (43, 0.25f),
             (41, 0.25f), (48, 0.25f), (48, 0.25f))));
 
+    // 3.2 second loop: ominous tritone bass walking down by semitones
+    public static AudioClip CastleTheme => Get("Castle Theme", () => Mix(
+        Voice(Wave.Triangle, 0.35f,
+            (38, 0.2f), (38, 0.2f), (44, 0.2f), (38, 0.2f),
+            (37, 0.2f), (37, 0.2f), (43, 0.2f), (37, 0.2f),
+            (36, 0.2f), (36, 0.2f), (42, 0.2f), (36, 0.2f),
+            (37, 0.2f), (37, 0.2f), (43, 0.2f), (37, 0.2f)),
+        Voice(Wave.Square, 0.06f,
+            (Rest, 0.8f), (74, 0.4f), (73, 0.4f),
+            (Rest, 0.8f), (70, 0.4f), (69, 0.4f))));
+
+    // 4 second loop: driving bass with short stabs for the boss fight
+    public static AudioClip BossTheme => Get("Boss Theme", () => Mix(
+        Voice(Wave.Triangle, 0.38f,
+            (40, 0.125f), (40, 0.125f), (52, 0.125f), (40, 0.125f), (46, 0.125f), (40, 0.125f), (52, 0.125f), (40, 0.125f),
+            (40, 0.125f), (40, 0.125f), (52, 0.125f), (40, 0.125f), (46, 0.125f), (40, 0.125f), (52, 0.125f), (40, 0.125f),
+            (41, 0.125f), (41, 0.125f), (53, 0.125f), (41, 0.125f), (47, 0.125f), (41, 0.125f), (53, 0.125f), (41, 0.125f),
+            (41, 0.125f), (41, 0.125f), (53, 0.125f), (41, 0.125f), (47, 0.125f), (41, 0.125f), (53, 0.125f), (41, 0.125f)),
+        Voice(Wave.Square, 0.08f,
+            (76, 0.25f), (Rest, 0.25f), (75, 0.25f), (Rest, 0.25f), (70, 0.5f), (Rest, 0.5f),
+            (77, 0.25f), (Rest, 0.25f), (76, 0.25f), (Rest, 0.25f), (71, 0.5f), (Rest, 0.5f))));
+
+    // 4 second bright loop for the victory screen
+    public static AudioClip VictoryTheme => Get("Victory Theme", () => Mix(
+        Voice(Wave.Square, 0.1f,
+            (72, 0.2f), (76, 0.2f), (79, 0.2f), (84, 0.6f),
+            (83, 0.2f), (79, 0.2f), (81, 0.6f), (79, 0.4f),
+            (77, 0.2f), (76, 0.2f), (74, 0.2f), (72, 0.8f)),
+        Voice(Wave.Triangle, 0.32f,
+            (48, 1.2f), (53, 1.4f), (43, 0.6f), (48, 0.8f))));
+
+    // short fanfare when the treasure is reached
+    public static AudioClip Fanfare => Get("Fanfare", () => Mix(
+        Voice(Wave.Square, 0.12f, (72, 0.12f), (76, 0.12f), (79, 0.12f), (84, 0.5f)),
+        Voice(Wave.Triangle, 0.3f, (48, 0.36f), (55, 0.5f))));
+
     // sound effects
+
+    public static AudioClip Fire => Get("Fire", () => Mix(Sweep(Wave.Noise, 0.18f, 90f, 60f, 0.25f)));
+
+    public static AudioClip LavaBurst => Get("Lava Burst", () => Mix(
+        Sweep(Wave.Noise, 0.14f, 70f, 100f, 0.2f),
+        Sweep(Wave.Triangle, 0.25f, 40f, 52f, 0.2f)));
+
+    public static AudioClip Crumble => Get("Crumble", () => Mix(Sweep(Wave.Noise, 0.2f, 80f, 50f, 0.35f)));
+
+    public static AudioClip CheckpointReached => Get("Checkpoint", () => Mix(Voice(Wave.Square, 0.12f,
+        (72, 0.08f), (79, 0.08f), (84, 0.2f))));
+
+    public static AudioClip GateMove => Get("Gate", () => Mix(
+        Sweep(Wave.Triangle, 0.4f, 40f, 52f, 0.8f),
+        Sweep(Wave.Noise, 0.06f, 60f, 60f, 0.8f)));
+
+    public static AudioClip BossRoar => Get("Boss Roar", () => Mix(
+        Sweep(Wave.Square, 0.16f, 50f, 38f, 0.7f),
+        Sweep(Wave.Noise, 0.12f, 70f, 50f, 0.7f)));
+
+    public static AudioClip BossHurt => Get("Boss Hurt", () => Mix(Sequence(
+        Sweep(Wave.Square, 0.16f, 76f, 64f, 0.08f),
+        Sweep(Wave.Square, 0.16f, 76f, 64f, 0.08f))));
+
+    public static AudioClip BossFire => Get("Boss Fire", () => Mix(
+        Sweep(Wave.Noise, 0.16f, 95f, 70f, 0.3f),
+        Sweep(Wave.Square, 0.06f, 60f, 48f, 0.3f)));
+
+    public static AudioClip Slam => Get("Slam", () => Mix(
+        Sweep(Wave.Noise, 0.24f, 60f, 40f, 0.4f),
+        Sweep(Wave.Triangle, 0.45f, 40f, 28f, 0.4f)));
+
+    public static AudioClip BossDefeat => Get("Boss Defeat", () => Mix(Sequence(
+        Sweep(Wave.Square, 0.14f, 72f, 60f, 0.25f),
+        Sweep(Wave.Square, 0.14f, 67f, 55f, 0.25f),
+        Sweep(Wave.Square, 0.14f, 62f, 40f, 0.8f))));
 
     public static AudioClip Swim => Get("Swim", () => Mix(Sweep(Wave.Triangle, 0.35f, 58f, 66f, 0.09f)));
 

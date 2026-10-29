@@ -5,7 +5,7 @@ using UnityEngine;
 [RequireComponent(typeof(AudioSource))]
 public class LevelMusic : MonoBehaviour
 {
-    public enum Theme { Underground, Water }
+    public enum Theme { Underground, Water, Castle, Boss, Victory }
 
     // optional, the synthesized theme is used when left empty
     public AudioClip music;
@@ -17,16 +17,18 @@ public class LevelMusic : MonoBehaviour
     private void Start()
     {
         source = GetComponent<AudioSource>();
-
-        if (music != null) {
-            source.clip = music;
-        } else {
-            source.clip = theme == Theme.Water ? ChiptuneSynth.WaterTheme : ChiptuneSynth.UndergroundTheme;
-        }
-
         source.loop = true;
         source.volume = volume;
-        source.Play();
+
+        if (music != null)
+        {
+            source.clip = music;
+            source.Play();
+        }
+        else
+        {
+            Play(theme);
+        }
     }
 
     private void Update()
@@ -36,10 +38,34 @@ public class LevelMusic : MonoBehaviour
         }
     }
 
+    // switches to another synthesized theme (e.g. when the boss fight starts)
+    public void Play(Theme theme)
+    {
+        if (source == null) {
+            return;
+        }
+
+        this.theme = theme;
+        source.clip = Clip(theme);
+        source.Play();
+    }
+
     public void Stop()
     {
         if (source != null) {
             source.Stop();
+        }
+    }
+
+    private static AudioClip Clip(Theme theme)
+    {
+        switch (theme)
+        {
+            case Theme.Water: return ChiptuneSynth.WaterTheme;
+            case Theme.Castle: return ChiptuneSynth.CastleTheme;
+            case Theme.Boss: return ChiptuneSynth.BossTheme;
+            case Theme.Victory: return ChiptuneSynth.VictoryTheme;
+            default: return ChiptuneSynth.UndergroundTheme;
         }
     }
 

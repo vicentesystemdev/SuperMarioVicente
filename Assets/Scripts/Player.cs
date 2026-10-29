@@ -14,6 +14,12 @@ public class Player : MonoBehaviour
     public bool dead => deathAnimation.enabled;
     public bool starpower { get; private set; }
 
+    // brief invulnerability after taking damage, so continuous hazards
+    // (spikes, fire) cannot hit again on the very next frame
+    public float invulnerableDuration = 2f;
+    public bool invulnerable => Time.time < invulnerableUntil;
+    private float invulnerableUntil;
+
     private void Awake()
     {
         capsuleCollider = GetComponent<CapsuleCollider2D>();
@@ -23,7 +29,7 @@ public class Player : MonoBehaviour
 
     public void Hit()
     {
-        if (!dead && !starpower)
+        if (!dead && !starpower && !invulnerable)
         {
             if (big) {
                 Shrink();
@@ -69,7 +75,24 @@ public class Player : MonoBehaviour
 
         Sfx.Play(ChiptuneSynth.PipeWarp);
 
+        invulnerableUntil = Time.time + invulnerableDuration;
         StartCoroutine(ScaleAnimation());
+        StartCoroutine(InvulnerableBlink());
+    }
+
+    private IEnumerator InvulnerableBlink()
+    {
+        while (invulnerable && !dead)
+        {
+            Color color = activeRenderer.spriteRenderer.color;
+            color.a = Time.frameCount % 8 < 4 ? 0.35f : 1f;
+            activeRenderer.spriteRenderer.color = color;
+            yield return null;
+        }
+
+        Color restored = activeRenderer.spriteRenderer.color;
+        restored.a = 1f;
+        activeRenderer.spriteRenderer.color = restored;
     }
 
     private IEnumerator ScaleAnimation()

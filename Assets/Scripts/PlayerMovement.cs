@@ -33,6 +33,14 @@ public class PlayerMovement : MonoBehaviour
     private float swimCeiling;
     private float lastStrokeTime = -1f;
 
+    private Vector2 carry;
+
+    // called by a MovingPlatform (which runs earlier) while mario stands on it
+    public void Carry(Vector2 platformVelocity)
+    {
+        carry = platformVelocity;
+    }
+
     private void Awake()
     {
         camera = Camera.main;
@@ -80,6 +88,10 @@ public class PlayerMovement : MonoBehaviour
         // move mario based on his velocity
         Vector2 position = rigidbody.position;
         position += velocity * Time.fixedDeltaTime;
+
+        // moving platforms carry mario (zero when not standing on one)
+        position += carry * Time.fixedDeltaTime;
+        carry = Vector2.zero;
 
         // clamp within the screen bounds
         Vector2 leftEdge = camera.ScreenToWorldPoint(Vector2.zero);
