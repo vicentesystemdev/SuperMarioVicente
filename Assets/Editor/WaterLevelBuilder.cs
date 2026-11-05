@@ -3,6 +3,7 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 // Builds Assets/Scenes/2-2.unity: a long underwater level in 8 sections.
 //
@@ -243,6 +244,42 @@ public static class WaterLevelBuilder
         barrierCollider.size = new Vector2(470f, 1f);
 
         BuildCamera();
+        BuildHUD();
+    }
+
+    private static void BuildHUD()
+    {
+        GameObject canvasObject = new GameObject(
+            "HUD Acuatico",
+            typeof(RectTransform),
+            typeof(Canvas),
+            typeof(CanvasScaler),
+            typeof(GraphicRaycaster)
+        );
+
+        Canvas canvas = canvasObject.GetComponent<Canvas>();
+        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        canvas.sortingOrder = 20;
+
+        CanvasScaler scaler = canvasObject.GetComponent<CanvasScaler>();
+        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+        scaler.referenceResolution = new Vector2(1920f, 1080f);
+        scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
+        scaler.matchWidthOrHeight = 0.5f;
+
+        GameObject bar = new GameObject("Barra Superior", typeof(RectTransform), typeof(Image));
+        bar.transform.SetParent(canvasObject.transform, false);
+
+        RectTransform rect = bar.GetComponent<RectTransform>();
+        rect.anchorMin = new Vector2(0f, 1f);
+        rect.anchorMax = new Vector2(1f, 1f);
+        rect.pivot = new Vector2(0.5f, 1f);
+        rect.anchoredPosition = Vector2.zero;
+        rect.sizeDelta = new Vector2(0f, 150f);
+
+        Image image = bar.GetComponent<Image>();
+        image.color = new Color(0.015f, 0.04f, 0.12f, 0.72f);
+        image.raycastTarget = false;
     }
 
     private static void BuildCamera()
