@@ -241,6 +241,8 @@ public static class WaterLevelBuilder
         GameObject music = new GameObject("Music", typeof(AudioSource));
         music.GetComponent<AudioSource>().playOnAwake = false;
         music.AddComponent<LevelMusic>().theme = LevelMusic.Theme.Water;
+        MusicaAcuaticaDinamica dynamicMusic = music.AddComponent<MusicaAcuaticaDinamica>();
+        dynamicMusic.cambioX = 58f;
 
         Place("Mario", null, 3f, -7f);
 
