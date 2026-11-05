@@ -14,6 +14,7 @@ public class GameManager : MonoBehaviour
     public int stage { get; private set; }
     public int lives { get; private set; }
     public int coins { get; private set; }
+    public int score { get; private set; }
     public bool resetting { get; private set; }
 
     // optional, a synthesized jingle is used when left empty
@@ -94,6 +95,7 @@ public class GameManager : MonoBehaviour
         hasCheckpoint = false;
         lives = StartingLives;
         coins = 0;
+        score = 0;
 
         Debug.Log($"[GameManager] Nueva partida: {lives} vidas");
     }
@@ -225,6 +227,11 @@ public class GameManager : MonoBehaviour
             coins = 0;
             AddLife();
         }
+    }
+
+    public void AddScore(int points)
+    {
+        score = Mathf.Max(0, score + points);
     }
 
     public void AddLife()
