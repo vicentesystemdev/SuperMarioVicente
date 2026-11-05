@@ -167,7 +167,11 @@ El trabajo es grupal, pero cada persona tiene un módulo principal y deberá exp
 Integrante	Módulo	Escenas o archivos relacionados
 Marcelo Josué Escobar Chipana	Castillo final y último nivel	8-4.unity y sistemas Castle/
 Víctor Grover Asturizaga Plata	Menús, música y efectos	MainMenu (integrado), Sfx.cs, ChiptuneSynth.cs
-Vicente Óscar Claros Mamani	Pantalla de vidas y canciones de victoria	GameManager.cs, GameOver.unity, Victory.unity
+Vicente Óscar Claros Mamani	- **HUD estilo NES:** puntuación, monedas, mundo y tiempo restante; se mantiene entre escenas mediante el `GameManager` persistente, sin crear interfaces duplicadas.
+- **Puntuación y temporizador:** puntos al recoger monedas, eliminar enemigos y obtener bonificaciones; cuenta regresiva configurable mediante `LevelSettings`, que se detiene durante la muerte y la finalización del nivel.
+- **Pantalla intermedia de vidas:** después de morir, aparece el mundo, el sprite de Mario y las vidas restantes (por defecto, 2,5 segundos). Con cero vidas se carga `GameOver` directamente.
+- **Audio al completar niveles:** efectos al tocar y bajar la bandera, seguidos de la fanfarria original `ChiptuneSynth.LevelClear` antes de cargar el siguiente escenario. Este audio de fin de nivel es distinto de `VictoryTheme`, que corresponde al cierre final del juego.
+- **Integración general:** adaptación de scripts compartidos, prevención de descuentos y bonificaciones duplicados, conservación del HUD y del flujo de reinicio.
 Carla Valeria Encinas Cano	Nivel acuático	2-2.unity, WaterZone.cs, WaterEnemy.cs
 
 
