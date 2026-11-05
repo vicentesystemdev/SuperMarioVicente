@@ -9,6 +9,8 @@ public abstract class WaterEnemy : MonoBehaviour
     protected SpriteRenderer spriteRenderer;
     protected Transform player;
 
+    public int puntos = 200;
+
     private bool active;
     private bool dead;
 
