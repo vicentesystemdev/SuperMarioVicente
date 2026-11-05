@@ -36,6 +36,19 @@ public class WaterZone : MonoBehaviour
 
     private void Start()
     {
+        Camera camera = Camera.main;
+
+        if (camera != null)
+        {
+            SideScrolling scrolling = camera.GetComponent<SideScrolling>();
+
+            if (scrolling != null)
+            {
+                scrolling.smoothTime = 0.12f;
+                scrolling.lookAhead = 2f;
+            }
+        }
+
         // Mario may spawn already inside the water
         PlayerMovement movement = FindAnyObjectByType<PlayerMovement>();
 
