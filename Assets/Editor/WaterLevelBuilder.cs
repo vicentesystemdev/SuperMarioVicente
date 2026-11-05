@@ -250,6 +250,7 @@ public static class WaterLevelBuilder
 
         BuildBounds(Group("Seabed and Walls", underwater));
         BuildWater(underwater);
+        BuildCurrents(underwater);
 
         Section1(NewSection(underwater, 0, "1 - Arrecife de entrada"));
         Section2(NewSection(underwater, 1, "2 - Bosque de coral y salida"));
@@ -301,6 +302,41 @@ public static class WaterLevelBuilder
 
         Tile("Water/Rock", parent, -2, StandRow, 2, TopRow - StandRow + 1, "Left Wall");
         Tile("Water/Rock", parent, 118, StandRow, 6, TopRow - StandRow + 1, "Right Wall");
+    }
+
+    private static void BuildCurrents(Transform parent)
+    {
+        Transform currents = Group("Corrientes Acuaticas", parent);
+        Sprite bubble = LoadSprite("Water_Bubble");
+
+        CreateCurrent(currents, new Vector3(52f, -9f, 0f), new Vector2(10f, 8f), new Vector2(2.6f, 0.7f), bubble, "Corriente a favor");
+        CreateCurrent(currents, new Vector3(86f, -9f, 0f), new Vector2(9f, 8f), new Vector2(-2.2f, 0.3f), bubble, "Corriente en contra");
+    }
+
+    private static void CreateCurrent(Transform parent, Vector3 position, Vector2 size, Vector2 force, Sprite bubble, string name)
+    {
+        GameObject zone = new GameObject(name);
+        zone.transform.SetParent(parent, false);
+        zone.transform.position = position;
+
+        BoxCollider2D collider = zone.AddComponent<BoxCollider2D>();
+        collider.isTrigger = true;
+        collider.size = size;
+
+        CorrienteAcuatica current = zone.AddComponent<CorrienteAcuatica>();
+        current.fuerza = force;
+
+        for (int i = 0; i < 5; i++)
+        {
+            GameObject indicator = new GameObject($"Burbuja corriente {i + 1}");
+            indicator.transform.SetParent(zone.transform, false);
+            indicator.transform.localPosition = new Vector3(-size.x * 0.35f + i * size.x * 0.17f, (i % 2 == 0 ? -1f : 1f) * 1.2f, 0f);
+
+            SpriteRenderer renderer = indicator.AddComponent<SpriteRenderer>();
+            renderer.sprite = bubble;
+            renderer.color = new Color(0.7f, 0.95f, 1f, 0.65f);
+            renderer.sortingOrder = 2;
+        }
     }
 
     private static void BuildWater(Transform parent)
