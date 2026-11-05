@@ -54,7 +54,7 @@ Assets/Scenes/
 └── Victory.unity   # Pantalla de victoria
 ```
 
-**Menú inicial integrado:** `MainMenu.unity` ocupa el índice `0` en **Build Profiles**. Incluye **JUGAR**, **CONTROLES** y **SALIR**; JUGAR inicia `1-1` con tres vidas. La validación final del ejecutable sigue pendiente.
+**Menú inicial integrado:** `MainMenu.unity` ocupa el índice `0` en **Build Profiles**. Incluye **JUGAR**, **SELECCIONAR NIVEL**, **CONTROLES**, **CRÉDITOS**, **CONFIGURACIÓN** y **SALIR**. JUGAR inicia `1-1` con tres vidas; las tarjetas también permiten comenzar en `1-2`, `2-2` y `8-4`. La validación final del ejecutable sigue pendiente.
 
 La ruta de juego prevista es:
 
@@ -114,6 +114,7 @@ El proyecto utiliza componentes **uGUI / Unity UI** en las interfaces. Si aparec
 | Navegar en el menú principal | Flechas arriba/abajo, `W`/`S` o ratón |
 | Confirmar en el menú principal | `Enter`, `Espacio` o clic |
 | Volver desde Controles al menú | `Esc` o botón VOLVER |
+| Pausar o continuar durante un nivel | `Esc` o `P` |
 
 ## 8. Compilación para Windows
 

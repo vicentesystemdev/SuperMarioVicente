@@ -113,9 +113,14 @@ public class GameManager : MonoBehaviour
 
     public void NewGame()
     {
+        NewGame(1, 1);
+    }
+
+    public void NewGame(int world, int stage)
+    {
         ResetGameState();
 
-        LoadLevel(1, 1);
+        LoadLevel(world, stage);
     }
 
     private void ResetGameState()
