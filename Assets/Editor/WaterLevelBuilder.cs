@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-// Builds Assets/Scenes/2-2.unity: a long underwater level in 8 sections.
+// Builds Assets/Scenes/2-2.unity: a compact underwater level in 5 sections.
 //
 // It also configures the import settings of the new sprites in
 // Assets/Sprites/Water (16 px per unit, point filter, full rect) and creates
@@ -338,7 +338,7 @@ public static class WaterLevelBuilder
 
     private static void BuildBounds(Transform parent)
     {
-        // seabed with two trenches (120-125 and 136-143)
+        // seabed with two short trenches (120-125 and 136-143)
         Floor(parent, -2, 119);
         Floor(parent, 126, 135);
         Floor(parent, 144, 299);
