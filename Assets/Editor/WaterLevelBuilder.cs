@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-// Builds Assets/Scenes/2-2.unity: a compact underwater level in 3 sections.
+// Builds Assets/Scenes/2-2.unity: a compact underwater level in 2 sections.
 //
 // It also configures the import settings of the new sprites in
 // Assets/Sprites/Water (16 px per unit, point filter, full rect) and creates
@@ -26,7 +26,7 @@ public static class WaterLevelBuilder
     private const int SurfaceRow = -3;
     private const int GroundRow = 0;    // surface ground rows 0 and 1
     private const int SectionWidth = 56;
-    private const float ExitX = 166.5f;
+    private const float ExitX = 110.5f;
 
     private static readonly Color WaterColor = new Color(0.13f, 0.33f, 0.78f);
     private static readonly Color FastFishColor = new Color(1f, 0.55f, 0.45f);
@@ -210,7 +210,7 @@ public static class WaterLevelBuilder
 
         GameObject levelSettings = new GameObject("Level Settings");
         LevelSettings settings = levelSettings.AddComponent<LevelSettings>();
-        settings.timeLimit = 120;
+        settings.timeLimit = 110;
         settings.secondsPerTick = 0.5f;
 
         GameObject music = new GameObject("Music", typeof(AudioSource));
@@ -227,8 +227,7 @@ public static class WaterLevelBuilder
         BuildWater(underwater);
 
         Section1(NewSection(underwater, 0, "1 - Arrecife de entrada"));
-        Section2(NewSection(underwater, 1, "2 - Bosque de coral"));
-        Section3(NewSection(underwater, 2, "3 - La fosa y salida"));
+        Section2(NewSection(underwater, 1, "2 - Bosque de coral y salida"));
 
         Pipe exitPipe = Place("PipeConnection", Group("Exit", underwater), ExitX, -13.5f, "Exit Pipe").GetComponent<Pipe>();
         exitPipe.connection = BuildSurface(surface);
@@ -237,11 +236,11 @@ public static class WaterLevelBuilder
         // death barrier below the trenches
         GameObject barrier = new GameObject("Death Barrier");
         barrier.transform.SetParent(level.transform, false);
-        barrier.transform.position = new Vector3(88f, -18.5f, 0f);
+        barrier.transform.position = new Vector3(58f, -18.5f, 0f);
         barrier.AddComponent<DeathBarrier>();
         BoxCollider2D barrierCollider = barrier.GetComponent<BoxCollider2D>();
         barrierCollider.isTrigger = true;
-        barrierCollider.size = new Vector2(190f, 1f);
+        barrierCollider.size = new Vector2(130f, 1f);
 
         BuildCamera();
     }
@@ -263,7 +262,7 @@ public static class WaterLevelBuilder
         scrolling.undergroundHeight = -9.5f;
         scrolling.undergroundThreshold = 0f;
         scrolling.limitRight = true;
-        scrolling.rightLimit = 220f;
+        scrolling.rightLimit = 142f;
         scrolling.smoothTime = 0.12f;
         scrolling.lookAhead = 2f;
         scrolling.changeBackground = true;
@@ -274,11 +273,9 @@ public static class WaterLevelBuilder
     {
         // seabed with two short trenches (120-125 and 136-143)
         Floor(parent, -2, 119);
-        Floor(parent, 126, 135);
-        Floor(parent, 144, 185);
 
         Tile("Water/Rock", parent, -2, StandRow, 2, TopRow - StandRow + 1, "Left Wall");
-        Tile("Water/Rock", parent, 174, StandRow, 12, TopRow - StandRow + 1, "Right Wall");
+        Tile("Water/Rock", parent, 118, StandRow, 6, TopRow - StandRow + 1, "Right Wall");
     }
 
     private static void BuildWater(Transform parent)
@@ -288,24 +285,24 @@ public static class WaterLevelBuilder
         GameObject water = new GameObject("Water Zone");
         water.layer = LayerMask.NameToLayer("Ignore Raycast");
         water.transform.SetParent(parent, false);
-        water.transform.position = new Vector3(84f, -10f, 0f);
+        water.transform.position = new Vector3(58f, -10f, 0f);
 
         WaterZone zone = water.AddComponent<WaterZone>();
         zone.bubbleSprite = LoadSprite("Water_Bubble");
 
         BoxCollider2D area = water.GetComponent<BoxCollider2D>();
         area.isTrigger = true;
-        area.size = new Vector2(174f, 13f);
+        area.size = new Vector2(122f, 13f);
 
         // animated look of the surface (decoration only)
         GameObject waves = new GameObject("Water Surface");
         waves.transform.SetParent(parent, false);
-        waves.transform.position = new Vector3(83.5f, SurfaceRow, 0f);
+        waves.transform.position = new Vector3(57.5f, SurfaceRow, 0f);
 
         SpriteRenderer spriteRenderer = waves.AddComponent<SpriteRenderer>();
         spriteRenderer.sprite = LoadSprite("Water_Surface");
         spriteRenderer.drawMode = SpriteDrawMode.Tiled;
-        spriteRenderer.size = new Vector2(171f, 1f);
+        spriteRenderer.size = new Vector2(119f, 1f);
         spriteRenderer.sortingOrder = 2;
     }
 
