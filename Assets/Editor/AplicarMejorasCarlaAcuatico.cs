@@ -8,7 +8,7 @@ using UnityEngine.UI;
 public static class AplicarMejorasCarlaAcuatico
 {
     private const string ScenePath = "Assets/Scenes/2-2.unity";
-    private const string MarkerName = "MEJORAS_CARLA_ACUATICO_V1";
+    private const string MarkerName = "MEJORAS_CARLA_ACUATICO_V2";
 
     static AplicarMejorasCarlaAcuatico()
     {
@@ -54,7 +54,12 @@ public static class AplicarMejorasCarlaAcuatico
         if (oldMarker != null)
             Object.DestroyImmediate(oldMarker);
 
-        new GameObject(MarkerName);
+        GameObject oldMarkerV1 = FindRoot(scene, "MEJORAS_CARLA_ACUATICO_V1");
+        if (oldMarkerV1 != null)
+            Object.DestroyImmediate(oldMarkerV1);
+
+        GameObject marker = new GameObject(MarkerName);
+        SceneManager.MoveGameObjectToScene(marker, scene);
 
         PrepararHud(scene);
         PrepararTemporizador(scene);
@@ -117,7 +122,15 @@ public static class AplicarMejorasCarlaAcuatico
             CrearTexto("Coins Value", bar.transform, "X00", new Vector2(570f, -92f));
             CrearTexto("World Label", bar.transform, "MUNDO 2-2", new Vector2(960f, -42f));
             CrearTexto("Time Label", bar.transform, "TIEMPO", new Vector2(1460f, -42f));
-            CrearTexto("Time Value", bar.transform, "180", new Vector2(1460f, -92f));
+            CrearTexto("Time Value", bar.transform, "120", new Vector2(1460f, -92f));
+        }
+
+        Transform timeTransform = hud.transform.Find("Barra Superior/Time Value");
+        if (timeTransform != null)
+        {
+            PixelText existingTime = timeTransform.GetComponent<PixelText>();
+            if (existingTime != null)
+                existingTime.SetText("120");
         }
     }
 
@@ -131,6 +144,10 @@ public static class AplicarMejorasCarlaAcuatico
             SceneManager.MoveGameObjectToScene(timer, scene);
             timer.AddComponent<TemporizadorAcuatico>();
         }
+
+        TemporizadorAcuatico timerComponent = timer.GetComponent<TemporizadorAcuatico>();
+        if (timerComponent != null)
+            timerComponent.tiempoInicial = 120;
     }
 
     private static void PrepararSalida(Scene scene)
@@ -141,7 +158,7 @@ public static class AplicarMejorasCarlaAcuatico
         {
             salida = new GameObject("Salida Acuatica Corta");
             SceneManager.MoveGameObjectToScene(salida, scene);
-            salida.transform.position = new Vector3(278f, -9f, 0f);
+            salida.transform.position = new Vector3(166f, -9f, 0f);
 
             BoxCollider2D collider = salida.AddComponent<BoxCollider2D>();
             collider.isTrigger = true;
