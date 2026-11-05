@@ -146,6 +146,31 @@ public static class WaterLevelBuilder
         fish.AddComponent<Fish>();
         SavePrefab(fish);
 
+        // puffer fish
+        GameObject puffer = CreateEnemyBase("PufferFish", LoadSprite("Fish_Swim1"));
+        SpriteRenderer pufferRenderer = puffer.GetComponent<SpriteRenderer>();
+        pufferRenderer.color = new Color(1f, 0.82f, 0.25f);
+        puffer.transform.localScale = Vector3.one * 1.25f;
+        AnimatedSprite pufferSwim = puffer.AddComponent<AnimatedSprite>();
+        pufferSwim.sprites = new[] { LoadSprite("Fish_Swim1"), LoadSprite("Fish_Swim2") };
+        pufferSwim.framerate = 0.24f;
+        CircleCollider2D pufferCollider = puffer.AddComponent<CircleCollider2D>();
+        pufferCollider.isTrigger = true;
+        pufferCollider.radius = 0.48f;
+        puffer.AddComponent<PufferFish>();
+        SavePrefab(puffer);
+
+        // eel
+        GameObject eel = CreateEnemyBase("Eel", LoadSprite("Fish_Swim1"));
+        SpriteRenderer eelRenderer = eel.GetComponent<SpriteRenderer>();
+        eelRenderer.color = new Color(0.35f, 1f, 0.55f);
+        eel.transform.localScale = new Vector3(1.8f, 0.75f, 1f);
+        CircleCollider2D eelCollider = eel.AddComponent<CircleCollider2D>();
+        eelCollider.isTrigger = true;
+        eelCollider.radius = 0.48f;
+        eel.AddComponent<Eel>();
+        SavePrefab(eel);
+
         // jellyfish
         GameObject jellyfish = CreateEnemyBase("Jellyfish", LoadSprite("Jellyfish_Contracted"));
         BoxCollider2D jellyCollider = jellyfish.AddComponent<BoxCollider2D>();
@@ -351,6 +376,7 @@ public static class WaterLevelBuilder
         Coin(s, 24, -10); Coin(s, 38, -11); Coin(s, 48, -10);
 
         AddFish(s, 34, -8f, 1.5f, 0.3f);
+        AddPufferFish(s, 42, -7f);
         AddFish(s, 50, -11f, 1.5f, 0.5f);
 
         Seaweed(s, 6); Seaweed(s, 10); Seaweed(s, 30); Seaweed(s, 44);
@@ -378,8 +404,11 @@ public static class WaterLevelBuilder
         Mystery(s, 38, -10, "1upMushroom");
 
         AddFish(s, 12, -6f, 2f, 0.5f);
+        AddEel(s, 14, -11f);
         AddFish(s, 26, -12f, 2f, 0.4f);
+        AddPufferFish(s, 34, -6f);
         AddFish(s, 38, -9f, 2.2f, 0.6f);
+        AddEel(s, 46, -10f);
         AddFish(s, 52, -6f, 2f, 0.5f);
         AddJellyfish(s, 30, -8f);
 
@@ -617,6 +646,16 @@ public static class WaterLevelBuilder
             blockHit.item = AssetDatabase.LoadAssetAtPath<GameObject>(Prefabs + item + ".prefab");
             Record(blockHit);
         }
+    }
+
+    private static void AddPufferFish(Section s, int x, float y)
+    {
+        Place("Water/PufferFish", s.enemies, s.x + x, y);
+    }
+
+    private static void AddEel(Section s, int x, float y)
+    {
+        Place("Water/Eel", s.enemies, s.x + x, y);
     }
 
     private static void AddFish(Section s, int x, float y, float speed, float amplitude)
