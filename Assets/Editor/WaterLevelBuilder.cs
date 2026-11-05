@@ -707,7 +707,10 @@ public static class WaterLevelBuilder
 
     private static void AddJellyfish(Section s, int x, float y)
     {
-        Place("Water/Jellyfish", s.enemies, s.x + x, y);
+        GameObject jellyfish = Place("Water/Jellyfish", s.enemies, s.x + x, y);
+        Jellyfish jelly = jellyfish.GetComponent<Jellyfish>();
+        jelly.puntos = 300;
+        Record(jelly);
     }
 
     private static void Seaweed(Section s, int x)
