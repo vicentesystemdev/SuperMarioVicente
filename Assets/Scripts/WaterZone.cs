@@ -86,7 +86,15 @@ public class WaterZone : MonoBehaviour
             return;
         }
 
-        if (Input.GetButtonDown("Jump") || Time.time >= nextBubble)
+        if (Input.GetButtonDown("Jump"))
+        {
+            nextBubble = Time.time + bubbleInterval;
+            Vector3 origin = swimmer.transform.position + new Vector3(0.3f, 0.5f);
+
+            Bubble.Spawn(bubbleSprite, origin, area.bounds.max.y - 0.5f);
+            Bubble.Spawn(bubbleSprite, origin + new Vector3(-0.18f, -0.12f), area.bounds.max.y - 0.5f);
+        }
+        else if (Time.time >= nextBubble)
         {
             nextBubble = Time.time + bubbleInterval;
             Bubble.Spawn(bubbleSprite, swimmer.transform.position + new Vector3(0.3f, 0.5f), area.bounds.max.y - 0.5f);
