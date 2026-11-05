@@ -284,7 +284,7 @@ public static class WaterLevelBuilder
         CreateHudText("Score Label", bar.transform, "000000", new Vector2(190f, -92f), 5f);
         CreateHudText("World Label", bar.transform, "MUNDO 2-2", new Vector2(960f, -42f), 5f);
         CreateHudText("Time Label", bar.transform, "TIEMPO", new Vector2(1460f, -42f), 5f);
-        CreateHudText("Time Value", bar.transform, "300", new Vector2(1460f, -92f), 5f);
+        CreateHudText("Time Value", bar.transform, "180", new Vector2(1460f, -92f), 5f);
         CreateHudText("Coins Label", bar.transform, "MONEDAS", new Vector2(570f, -42f), 5f);
         CreateHudText("Coins Value", bar.transform, "X00", new Vector2(570f, -92f), 5f);
     }
@@ -330,6 +330,8 @@ public static class WaterLevelBuilder
         scrolling.undergroundThreshold = 0f;
         scrolling.limitRight = true;
         scrolling.rightLimit = 320f;
+        scrolling.smoothTime = 0.12f;
+        scrolling.lookAhead = 2f;
         scrolling.changeBackground = true;
         scrolling.undergroundBackground = WaterColor;
     }
