@@ -68,15 +68,15 @@ El trabajo de **Víctor** está incorporado a la rama `main` y utiliza [`Assets/
 
 ```mermaid
 flowchart LR
-    A[MainMenu] --> B[1-1]
-    B --> C[1-2]
-    C --> D[2-2]
-    D --> E[8-4]
-    E --> F[Victory]
-    B -. Sin vidas .-> G[GameOver]
-    C -. Sin vidas .-> G
-    D -. Sin vidas .-> G
-    E -. Sin vidas .-> G
+    menu["Menu principal"] --> n11["Nivel 1-1"]
+    n11 --> n12["Nivel 1-2"]
+    n12 --> n22["Nivel 2-2"]
+    n22 --> n84["Nivel 8-4"]
+    n84 --> victoria["Victoria"]
+    n11 -->|Sin vidas| gameover["Game Over"]
+    n12 -->|Sin vidas| gameover
+    n22 -->|Sin vidas| gameover
+    n84 -->|Sin vidas| gameover
 ```
 
 <sub>El diagrama representa la **ruta de juego prevista**. La conectividad de todas las tuberías, banderas, menús y pantallas debe comprobarse jugando la secuencia completa.</sub>
@@ -212,11 +212,11 @@ git switch main
 
 ```mermaid
 flowchart LR
-    A[Feature del integrante] --> B[Commit + push]
-    B --> C[Pull Request]
-    C --> D[develop]
-    D --> E[Revisión y pruebas]
-    E --> F[main]
+    feature["Rama del integrante"] --> commit["Commit y push"]
+    commit --> pr["Pull Request"]
+    pr --> develop["develop"]
+    develop --> revision["Revision y pruebas"]
+    revision --> main["main"]
 ```
 
 Para comprobar la autoría y el trabajo compartido, consulta [los commits de `main`](https://github.com/vicentesystemdev/SuperMarioVicente/commits/main/), [las ramas](https://github.com/vicentesystemdev/SuperMarioVicente/branches) y [los Pull Requests](https://github.com/vicentesystemdev/SuperMarioVicente/pulls?q=is%3Apr+is%3Amerged).
