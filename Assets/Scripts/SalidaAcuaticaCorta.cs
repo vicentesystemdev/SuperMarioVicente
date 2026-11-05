@@ -9,17 +9,20 @@ public class SalidaAcuaticaCorta : MonoBehaviour
         if (SceneManager.GetActiveScene().name != "2-2")
             return;
 
-        if (GameObject.Find("Salida Acuatica Corta") != null)
-            return;
+        GameObject salida = GameObject.Find("Salida Acuatica Corta");
 
-        GameObject salida = new GameObject("Salida Acuatica Corta");
-        salida.transform.position = new Vector3(278f, -9f, 0f);
+        if (salida == null)
+        {
+            salida = new GameObject("Salida Acuatica Corta");
+            salida.AddComponent<BoxCollider2D>();
+            salida.AddComponent<SalidaAcuaticaCorta>();
+        }
 
-        BoxCollider2D collider = salida.AddComponent<BoxCollider2D>();
+        salida.transform.position = new Vector3(166f, -9f, 0f);
+
+        BoxCollider2D collider = salida.GetComponent<BoxCollider2D>();
         collider.isTrigger = true;
         collider.size = new Vector2(3f, 14f);
-
-        salida.AddComponent<SalidaAcuaticaCorta>();
     }
 
     private void OnTriggerEnter2D(Collider2D other)

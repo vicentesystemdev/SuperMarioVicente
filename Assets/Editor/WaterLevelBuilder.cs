@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-// Builds Assets/Scenes/2-2.unity: a compact underwater level in 5 sections.
+// Builds Assets/Scenes/2-2.unity: a compact underwater level in 3 sections.
 //
 // It also configures the import settings of the new sprites in
 // Assets/Sprites/Water (16 px per unit, point filter, full rect) and creates
@@ -26,7 +26,7 @@ public static class WaterLevelBuilder
     private const int SurfaceRow = -3;
     private const int GroundRow = 0;    // surface ground rows 0 and 1
     private const int SectionWidth = 56;
-    private const float ExitX = 278.5f;
+    private const float ExitX = 166.5f;
 
     private static readonly Color WaterColor = new Color(0.13f, 0.33f, 0.78f);
     private static readonly Color FastFishColor = new Color(1f, 0.55f, 0.45f);
@@ -223,9 +223,7 @@ public static class WaterLevelBuilder
 
         Section1(NewSection(underwater, 0, "1 - Arrecife de entrada"));
         Section2(NewSection(underwater, 1, "2 - Bosque de coral"));
-        Section3(NewSection(underwater, 2, "3 - La fosa"));
-        Section4(NewSection(underwater, 3, "4 - Corredor estrecho"));
-        Section5(NewSection(underwater, 4, "5 - Laberinto final"));
+        Section3(NewSection(underwater, 2, "3 - La fosa y salida"));
 
         Pipe exitPipe = Place("PipeConnection", Group("Exit", underwater), ExitX, -13.5f, "Exit Pipe").GetComponent<Pipe>();
         exitPipe.connection = BuildSurface(surface);
@@ -234,11 +232,11 @@ public static class WaterLevelBuilder
         // death barrier below the trenches
         GameObject barrier = new GameObject("Death Barrier");
         barrier.transform.SetParent(level.transform, false);
-        barrier.transform.position = new Vector3(145f, -18.5f, 0f);
+        barrier.transform.position = new Vector3(88f, -18.5f, 0f);
         barrier.AddComponent<DeathBarrier>();
         BoxCollider2D barrierCollider = barrier.GetComponent<BoxCollider2D>();
         barrierCollider.isTrigger = true;
-        barrierCollider.size = new Vector2(310f, 1f);
+        barrierCollider.size = new Vector2(190f, 1f);
 
         BuildCamera();
         BuildHUD();
@@ -284,7 +282,7 @@ public static class WaterLevelBuilder
         CreateHudText("Score Label", bar.transform, "000000", new Vector2(190f, -92f), 5f);
         CreateHudText("World Label", bar.transform, "MUNDO 2-2", new Vector2(960f, -42f), 5f);
         CreateHudText("Time Label", bar.transform, "TIEMPO", new Vector2(1460f, -42f), 5f);
-        CreateHudText("Time Value", bar.transform, "180", new Vector2(1460f, -92f), 5f);
+        CreateHudText("Time Value", bar.transform, "120", new Vector2(1460f, -92f), 5f);
         CreateHudText("Coins Label", bar.transform, "MONEDAS", new Vector2(570f, -42f), 5f);
         CreateHudText("Coins Value", bar.transform, "X00", new Vector2(570f, -92f), 5f);
     }
@@ -329,7 +327,7 @@ public static class WaterLevelBuilder
         scrolling.undergroundHeight = -9.5f;
         scrolling.undergroundThreshold = 0f;
         scrolling.limitRight = true;
-        scrolling.rightLimit = 320f;
+        scrolling.rightLimit = 220f;
         scrolling.smoothTime = 0.12f;
         scrolling.lookAhead = 2f;
         scrolling.changeBackground = true;
@@ -341,10 +339,10 @@ public static class WaterLevelBuilder
         // seabed with two short trenches (120-125 and 136-143)
         Floor(parent, -2, 119);
         Floor(parent, 126, 135);
-        Floor(parent, 144, 299);
+        Floor(parent, 144, 185);
 
         Tile("Water/Rock", parent, -2, StandRow, 2, TopRow - StandRow + 1, "Left Wall");
-        Tile("Water/Rock", parent, 286, StandRow, 14, TopRow - StandRow + 1, "Right Wall");
+        Tile("Water/Rock", parent, 174, StandRow, 12, TopRow - StandRow + 1, "Right Wall");
     }
 
     private static void BuildWater(Transform parent)
@@ -354,24 +352,24 @@ public static class WaterLevelBuilder
         GameObject water = new GameObject("Water Zone");
         water.layer = LayerMask.NameToLayer("Ignore Raycast");
         water.transform.SetParent(parent, false);
-        water.transform.position = new Vector3(140f, -10f, 0f);
+        water.transform.position = new Vector3(84f, -10f, 0f);
 
         WaterZone zone = water.AddComponent<WaterZone>();
         zone.bubbleSprite = LoadSprite("Water_Bubble");
 
         BoxCollider2D area = water.GetComponent<BoxCollider2D>();
         area.isTrigger = true;
-        area.size = new Vector2(285f, 13f);
+        area.size = new Vector2(174f, 13f);
 
         // animated look of the surface (decoration only)
         GameObject waves = new GameObject("Water Surface");
         waves.transform.SetParent(parent, false);
-        waves.transform.position = new Vector3(139f, SurfaceRow, 0f);
+        waves.transform.position = new Vector3(83.5f, SurfaceRow, 0f);
 
         SpriteRenderer spriteRenderer = waves.AddComponent<SpriteRenderer>();
         spriteRenderer.sprite = LoadSprite("Water_Surface");
         spriteRenderer.drawMode = SpriteDrawMode.Tiled;
-        spriteRenderer.size = new Vector2(282f, 1f);
+        spriteRenderer.size = new Vector2(171f, 1f);
         spriteRenderer.sortingOrder = 2;
     }
 
@@ -380,22 +378,22 @@ public static class WaterLevelBuilder
         Transform terrain = Group("Terrain", root);
         Transform exit = Group("Exit", root);
 
-        Tile("Ground", terrain, 272, GroundRow, 68, 2, "Ground");
+        Tile("Ground", terrain, 160, GroundRow, 68, 2, "Ground");
 
         // exit of the underwater warp (connection target)
-        GameObject surfacePipe = Place("Pipe", Group("Pipes", root), 290.5f, GroundRow + 3f, "Surface Pipe");
+        GameObject surfacePipe = Place("Pipe", Group("Pipes", root), 178.5f, GroundRow + 3f, "Surface Pipe");
         SetPipeLength(surfacePipe, 1);
 
         for (int i = 0; i < 4; i++) {
-            Tile("HardBlock", terrain, 300 + i, GroundRow + 2, 1, i + 1, "Stair");
+            Tile("HardBlock", terrain, 188 + i, GroundRow + 2, 1, i + 1, "Stair");
         }
 
-        Place("HardBlock", exit, 310f, 2f, "Flag Base");
-        Transform castle = Place("Castle", exit, 317f, 2f).transform;
+        Place("HardBlock", exit, 198f, 2f, "Flag Base");
+        Transform castle = Place("Castle", exit, 205f, 2f).transform;
 
         // the Bowser castle (8-4) does not exist yet; GameManager.LoadLevel
         // falls back to 1-1 until it is added to Build Profiles
-        FlagPole flagPole = Place("Flag Pole", exit, 310f, 2f).GetComponent<FlagPole>();
+        FlagPole flagPole = Place("Flag Pole", exit, 198f, 2f).GetComponent<FlagPole>();
         flagPole.castle = castle;
         flagPole.nextWorld = 8;
         flagPole.nextStage = 4;
