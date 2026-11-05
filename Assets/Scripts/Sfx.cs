@@ -8,7 +8,7 @@ public static class Sfx
 
     public static void Play(AudioClip clip, float volume = 1f)
     {
-        if (clip == null) {
+        if (clip == null || !Hito4AudioSettings.SfxEnabled) {
             return;
         }
 

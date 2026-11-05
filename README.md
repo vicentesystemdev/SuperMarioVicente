@@ -9,7 +9,7 @@ Cuatro responsabilidades, varios mundos y una experiencia de principio a fin.
 Empezar · Explorar mundos · Conocer al equipo · Instalar · Ver pruebas
 </div><div align="center">
 <sub>Secuencia animada elaborada para esta documentación. Es una visualización conceptual del flujo, no una grabación de Unity ni evidencia de funcionalidades ya probadas.</sub>
-</div>Estado del proyecto: integración grupal en desarrollo. En el repositorio técnico consultado ya aparecen las escenas 1-1, 1-2, 2-2, 8-4, GameOver y Victory. La escena inicial MenuPrincipal y las verificaciones completas de HUD, puntuación, tiempo y SFX siguen sujetas a integración y pruebas. Los apartados de este README separan código existente, trabajo asignado y pruebas pendientes.
+</div>Estado del proyecto: menú profesional integrado con selección de cuatro niveles, controles, créditos, configuración de audio y pausa. Las seis pantallas y la navegación de los cuatro niveles se verificaron en Unity; la compilación del ejecutable Windows sigue pendiente.
 
 <a id="etapa-01"></a>
 01 · Comienza aquí
@@ -63,7 +63,7 @@ flowchart TD
 ```
 Descubre cada pantalla
 <details>
-<summary><strong>01 — MENÚ PRINCIPAL · Punto de entrada</strong></summary>La escena objetivo Assets/Scenes/MenuPrincipal.unity se encargará de presentar el nombre del juego, animaciones de fondo, opciones claras y música ambiental.
+<summary><strong>01 — MENÚ PRINCIPAL · Punto de entrada</strong></summary>La escena Assets/Scenes/MainMenu.unity presenta el título, el personaje animado y las opciones Jugar, Seleccionar nivel, Controles, Créditos, Configuración y Salir.
 Elemento	Comportamiento previsto
 Jugar	Abre el nivel 1-1.
 Seleccionar nivel	Muestra las tarjetas de 1-1, 1-2, 2-2 y 8-4.
@@ -72,6 +72,7 @@ Créditos	Presenta integrantes y responsabilidades.
 Sonido	Permite ajustar o activar/desactivar el sonido, según lo implementado.
 Salir	Cierra la aplicación compilada.
 
+**Menú inicial integrado:** `MainMenu.unity` ocupa el índice `0` en **Build Profiles**. Incluye **JUGAR**, **SELECCIONAR NIVEL**, **CONTROLES**, **CRÉDITOS**, **CONFIGURACIÓN** y **SALIR**. JUGAR inicia `1-1` con tres vidas; las tarjetas también permiten comenzar en `1-2`, `2-2` y `8-4`. La validación final del ejecutable sigue pendiente.
 
 Responsable principal: Víctor. Estado: por integrar y probar en el fork del grupo.
 </details><details>
@@ -143,12 +144,19 @@ Tiempo	No se confirmó un temporizador global en GameManager.cs.	Crear o validar
 
 
 04.3 · Controles
-Acción	Controles del proyecto
-Moverse	A / D o flechas izquierda / derecha.
-Saltar	Espacio, mediante la acción Jump de Unity.
-Nadar	Pulsaciones de Espacio dentro del agua.
-Entrar en tuberías	S en entradas habilitadas; comprobar según escenario.
-Navegar el menú	Ratón, flechas y Enter, cuando la escena de menú esté integrada.
+
+| Acción | Control |
+|---|---|
+| Mover a Mario | `A`/`D` o flechas izquierda/derecha |
+| Saltar | `Espacio` |
+| Nadar (en `2-2`) | Pulsar `Espacio` repetidamente para dar brazadas |
+| Entrar en tubería vertical | `S`, cuando corresponda |
+| Entrar en tubería lateral | `D`, cuando corresponda |
+| Seleccionar/confirmar en pantallas de opciones | Teclado o ratón, según la escena |
+| Navegar en el menú principal | Flechas arriba/abajo, `W`/`S` o ratón |
+| Confirmar en el menú principal | `Enter`, `Espacio` o clic |
+| Volver desde Controles al menú | `Esc` o botón VOLVER |
+| Pausar o continuar durante un nivel | `Esc` o `P` |
 
 
 No incluimos teclas de carrera o pausa como si fueran definitivas: hay que comprobar su asignación en el proyecto antes de publicarlas como controles funcionales.
@@ -158,7 +166,7 @@ No incluimos teclas de carrera o pausa como si fueran definitivas: hay que compr
 El trabajo es grupal, pero cada persona tiene un módulo principal y deberá explicar en el foro lo que realmente desarrolló, probó y aprendió.
 Integrante	Módulo	Escenas o archivos relacionados
 Marcelo Josué Escobar Chipana	Castillo final y último nivel	8-4.unity y sistemas Castle/
-Víctor Grover Asturizaga Plata	Menús, música y efectos	MenuPrincipal (objetivo), Sfx.cs, ChiptuneSynth.cs
+Víctor Grover Asturizaga Plata	Menús, música y efectos	MainMenu (integrado), Sfx.cs, ChiptuneSynth.cs
 Vicente Óscar Claros Mamani	Pantalla de vidas y canciones de victoria	GameManager.cs, GameOver.unity, Victory.unity
 Carla Valeria Encinas Cano	Nivel acuático	2-2.unity, WaterZone.cs, WaterEnemy.cs
 
@@ -251,7 +259,7 @@ Para usarla, descarga el paquete completo y abre ese HTML en un navegador. El RE
 ├── ProjectSettings/
 ├── VISTA_INTERACTIVA.html           # Maqueta NUEVA, opcional
 └── README.md                        # Documentación grupal NUEVA
-Nota: MenuPrincipal.unity es parte de la integración que corresponde realizar; no aparece aún en la estructura del main revisado. Los elementos marcados como nuevos se adjuntan en este paquete de documentación.
+Nota: MainMenu.unity ya está integrada y ocupa el índice 0. El menú conserva los HUD, puntajes, vidas y sonidos del juego; su pausa se añade al cargar cada nivel.
 </details><a id="etapa-08"></a>
 08 · Instalación paso a paso
 <details open>
@@ -264,7 +272,7 @@ En Unity Hub, usa Add project from disk, selecciona la carpeta descargada y abre
 2. Presiona Play y verifica movimiento, salto y colisiones.
 3. Repite con 1-2, 2-2, 8-4, GameOver y Victory si necesitas validar módulos por separado.
 </details><details>
-<summary><strong>Paso C — Integrar el menú inicial</strong></summary>1. Incorpora la escena MenuPrincipal.unity del trabajo de Víctor a Assets/Scenes/.
+<summary><strong>Paso C — Integrar el menú inicial</strong></summary>1. Incorpora la escena MainMenu.unity del trabajo de Víctor a Assets/Scenes/.
 2. Conecta los botones a las escenas disponibles.
 3. Abre File > Build Profiles > Scene List.
 4. Habilita las escenas necesarias y coloca MenuPrincipal en índice 0.
