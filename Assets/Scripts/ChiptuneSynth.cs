@@ -65,6 +65,19 @@ public static class ChiptuneSynth
             (36, 0.25f), (43, 0.25f), (43, 0.25f),
             (41, 0.25f), (48, 0.25f), (48, 0.25f))));
 
+    // darker and faster second phase for the compact aquatic level
+    public static AudioClip DeepWaterTheme => Get("Deep Water Theme", () => Mix(
+        Voice(Wave.Square, 0.08f,
+            (72, 0.18f), (76, 0.18f), (79, 0.18f), (83, 0.36f),
+            (81, 0.18f), (79, 0.18f), (76, 0.18f), (74, 0.36f),
+            (72, 0.18f), (74, 0.18f), (77, 0.18f), (81, 0.36f),
+            (79, 0.18f), (76, 0.18f), (74, 0.18f), (72, 0.36f)),
+        Voice(Wave.Triangle, 0.28f,
+            (36, 0.18f), (43, 0.18f), (48, 0.18f), (43, 0.18f),
+            (38, 0.18f), (45, 0.18f), (50, 0.18f), (45, 0.18f),
+            (41, 0.18f), (48, 0.18f), (53, 0.18f), (48, 0.18f),
+            (38, 0.18f), (45, 0.18f), (50, 0.18f), (45, 0.18f))));
+
     // 3.2 second loop: ominous tritone bass walking down by semitones
     public static AudioClip CastleTheme => Get("Castle Theme", () => Mix(
         Voice(Wave.Triangle, 0.35f,
