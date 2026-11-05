@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour
 {
     public const int StartingLives = 3;
+    public const string MainMenuScene = "MainMenu";
     public const string GameOverScene = "GameOver";
     public const string VictoryScene = "Victory";
 
@@ -69,6 +70,10 @@ public class GameManager : MonoBehaviour
             ResetGameState();
             this.world = world;
             this.stage = stage;
+        }
+        else if (SceneManager.GetActiveScene().name == MainMenuScene)
+        {
+            ResetGameState();
         }
         else
         {

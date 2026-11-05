@@ -49,13 +49,14 @@ La música y los efectos añadidos para las mejoras utilizan **síntesis de audi
 
 2. Abrir **Unity Hub** y seleccionar **Add project from disk**.
 3. Elegir la carpeta clonada y abrirla con **Unity 6000.3.16f1**.
-4. Abrir `Assets/Scenes/1-1.unity` y ejecutar **Play**.
+4. Abrir `Assets/Scenes/MainMenu.unity` y ejecutar **Play**. Elegir **JUGAR** para comenzar una partida con 3 vidas en `1-1`.
 5. Verificar en **File → Build Profiles → Scene List** las escenas registradas y habilitadas.
 
 ### Escenas disponibles
 
 ```text
 Assets/Scenes/
+├── MainMenu.unity  # Menú principal: Jugar, Controles y Salir
 ├── 1-1.unity       # Nivel inicial del proyecto base
 ├── 1-2.unity       # Nivel subterráneo
 ├── 2-2.unity       # Nivel acuático
@@ -75,12 +76,15 @@ La escena `8-4` y la pantalla de victoria se incorporarán cuando termine y se v
 | Entrar a la tubería lateral de salida | `D` cuando corresponda |
 | Navegar en Game Over | Flechas arriba / abajo o ratón |
 | Confirmar en Game Over | `Enter` o clic |
+| Navegar en el menú principal | Flechas arriba / abajo, `W` / `S` o ratón |
+| Confirmar en el menú principal | `Enter`, `Espacio` o clic |
+| Volver desde Controles al menú | `Esc` o botón VOLVER |
 
 ## Compilar el ejecutable Windows
 
 1. Abrir **File → Build Profiles**.
 2. Seleccionar **Windows** e **Intel 64-bit**.
-3. Comprobar que las escenas que se necesitan estén habilitadas en **Scene List** y que `1-1` ocupe el índice `0`.
+3. Comprobar que las escenas que se necesitan estén habilitadas en **Scene List** y que `MainMenu` ocupe el índice `0`.
 4. Generar el ejecutable con **Build**.
 5. Probar el ejecutable fuera del Editor.
 6. Para la evaluación, comprimir **todos los archivos generados por Unity**, incluida la carpeta `*_Data`, y entregar el `.zip`, `.rar` o `.7z` junto con el enlace a este repositorio.
