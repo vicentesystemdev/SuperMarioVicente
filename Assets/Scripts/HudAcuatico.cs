@@ -100,26 +100,23 @@ public class HudAcuatico : MonoBehaviour
 
     private void Update()
     {
-        if (coinsValue == null || GameManager.Instance == null)
+        if (GameManager.Instance == null)
             return;
 
         int coins = GameManager.Instance.coins;
 
-        if (coins == lastCoins)
-            return;
-
-        lastCoins = coins;
-        coinsValue.SetText($"X{coins:00}");
-
-        if (scoreValue == null)
-            return;
+        if (coinsValue != null && coins != lastCoins)
+        {
+            lastCoins = coins;
+            coinsValue.SetText($"X{coins:00}");
+        }
 
         int score = GameManager.Instance.score;
 
-        if (score == lastScore)
-            return;
-
-        lastScore = score;
-        scoreValue.SetText($"{score:000000}");
+        if (scoreValue != null && score != lastScore)
+        {
+            lastScore = score;
+            scoreValue.SetText($"{score:000000}");
+        }
     }
 }
