@@ -29,7 +29,7 @@ El código, escenas y recursos del proyecto base **no fueron creados íntegramen
 | Requisito | Situación al organizar el trabajo | Responsable principal |
 |---|---|---|
 | Fork del proyecto proporcionado | Fork público existente; se utiliza como repositorio de trabajo del equipo. | Equipo |
-| Menú principal interactivo | **Pendiente de integración y prueba.** Todas las opciones solicitadas deben iniciar el juego. | Víctor |
+| Menú principal interactivo | **V1 integrada.** JUGAR inicia la partida; CONTROLES muestra la ayuda y SALIR cierra el juego. Validación final del ejecutable pendiente. | Víctor |
 | Sonido ambiente | Ya existen sistemas de música sintetizada en varios niveles; verificar y completar especialmente `1-1`. | Revisión conjunta |
 | SFX: salto, pisotón, power-up, daño y muerte | El proyecto contiene llamadas a efectos sintetizados; se deben probar todos en juego y corregir faltantes. | Revisión conjunta |
 | HUD: tiempo restante, puntaje y monedas | `GameManager` ya almacena monedas; falta comprobar/implementar interfaz visible, tiempo y puntaje por acciones. | Vicente |
@@ -45,6 +45,7 @@ Los archivos presentes en el repositorio son:
 
 ```text
 Assets/Scenes/
+├── MainMenu.unity  # Menú principal: Jugar, Controles y Salir
 ├── 1-1.unity       # Nivel inicial del proyecto base
 ├── 1-2.unity       # Nivel subterráneo añadido
 ├── 2-2.unity       # Nivel acuático añadido
@@ -53,7 +54,7 @@ Assets/Scenes/
 └── Victory.unity   # Pantalla de victoria
 ```
 
-**Menú grupal en desarrollo:** `MainMenu.unity` aún no se considera incorporado hasta que esté creado, probado y fusionado. Cuando esté listo, será la escena de arranque en **Build Profiles**; mientras tanto, la escena inicial es `1-1`.
+**Menú inicial integrado:** `MainMenu.unity` ocupa el índice `0` en **Build Profiles**. Incluye **JUGAR**, **CONTROLES** y **SALIR**; JUGAR inicia `1-1` con tres vidas. La validación final del ejecutable sigue pendiente.
 
 La ruta de juego prevista es:
 
@@ -70,7 +71,7 @@ Si se agotan las vidas, se muestra `GameOver`. La ruta completa debe validarse e
 - Nivel **subterráneo 1-2**: plataformas, tuberías, enemigos, monedas y música sintetizada.
 - Nivel **acuático 2-2**: brazadas, flotabilidad, enemigos acuáticos y ambientación.
 - Nivel **castillo 8-4** y escena **Victory**, sujetos a las mejoras y pruebas grupales.
-- Efectos y música generados por síntesis de audio mediante código, sin incluir grabaciones de música comercial original de Nintendo.
+- Audio importado del proyecto Mario Victor para las pistas y efectos correspondientes; los efectos sin una grabación equivalente conservan la síntesis por código.
 
 Para evitar confusión, **las funcionalidades grupales pendientes no se declaran terminadas** hasta que el equipo las pruebe y las fusione.
 
@@ -95,8 +96,8 @@ No hacer `push --force` ni sobrescribir el trabajo de otros integrantes. Cada in
 
 3. Abrir la carpeta desde Unity Hub con **Add project from disk**.
 4. Para revisar el trabajo integrado del grupo, usar la rama `develop` y confirmar que Unity no esté en ejecución antes de cambiar de rama.
-5. Revisar **File → Build Profiles → Scene List**. El primer índice debe corresponder a `MainMenu` cuando este se haya integrado; hasta entonces corresponde a `1-1`.
-6. Abrir la escena de inicio y probar con **Play**. Confirmar **cero errores de compilación** en Console.
+5. Revisar **File → Build Profiles → Scene List**. `MainMenu` debe ocupar el índice `0`.
+6. Abrir `Assets/Scenes/MainMenu.unity`, ejecutar **Play** y elegir **JUGAR** para iniciar la partida. Confirmar **cero errores de compilación** en Console.
 
 El proyecto utiliza componentes **uGUI / Unity UI** en las interfaces. Si aparecen errores por `Button`, `RawImage` o `EventSystems`, verificar la resolución de `com.unity.ugui` mediante Package Manager antes de modificar scripts.
 
@@ -110,10 +111,13 @@ El proyecto utiliza componentes **uGUI / Unity UI** en las interfaces. Si aparec
 | Entrar en tubería vertical | `S`, cuando corresponda |
 | Entrar en tubería lateral | `D`, cuando corresponda |
 | Seleccionar/confirmar en pantallas de opciones | Teclado o ratón, según la escena |
+| Navegar en el menú principal | Flechas arriba/abajo, `W`/`S` o ratón |
+| Confirmar en el menú principal | `Enter`, `Espacio` o clic |
+| Volver desde Controles al menú | `Esc` o botón VOLVER |
 
 ## 8. Compilación para Windows
 
-En Unity 6 ir a **File → Build Profiles → Windows**, seleccionar **Intel 64-bit**, revisar la lista de escenas y pulsar **Build**. Probar el `.exe` fuera del Editor y comprimir **toda la carpeta generada** (ejecutable, carpeta `*_Data` y bibliotecas) en `.zip` para su entrega cuando se solicite.
+En Unity 6 ir a **File → Build Profiles → Windows**, seleccionar **Intel 64-bit**, comprobar que `MainMenu` ocupe el índice `0` de la lista de escenas y pulsar **Build**. Probar el `.exe` fuera del Editor y comprimir **toda la carpeta generada** (ejecutable, carpeta `*_Data` y bibliotecas) en `.zip` para su entrega cuando se solicite.
 
 La compilación final solo se considera terminada después de verificar menú, HUD, audio, transiciones, GameOver y Victoria en el ejecutable.
 
