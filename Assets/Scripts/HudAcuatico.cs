@@ -5,7 +5,9 @@ using UnityEngine.UI;
 public class HudAcuatico : MonoBehaviour
 {
     private PixelText coinsValue;
+    private PixelText scoreValue;
     private int lastCoins = -1;
+    private int lastScore = -1;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     private static void PrepararHud()
@@ -87,9 +89,13 @@ public class HudAcuatico : MonoBehaviour
     private void Awake()
     {
         Transform value = transform.Find("Barra Superior/Coins Value");
+        Transform score = transform.Find("Barra Superior/Score Label");
 
         if (value != null)
             coinsValue = value.GetComponent<PixelText>();
+
+        if (score != null)
+            scoreValue = score.GetComponent<PixelText>();
     }
 
     private void Update()
@@ -104,5 +110,16 @@ public class HudAcuatico : MonoBehaviour
 
         lastCoins = coins;
         coinsValue.SetText($"X{coins:00}");
+
+        if (scoreValue == null)
+            return;
+
+        int score = GameManager.Instance.score;
+
+        if (score == lastScore)
+            return;
+
+        lastScore = score;
+        scoreValue.SetText($"{score:000000}");
     }
 }
