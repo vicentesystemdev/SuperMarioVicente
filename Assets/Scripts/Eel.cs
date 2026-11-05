@@ -14,7 +14,7 @@ public class Eel : WaterEnemy
     protected override void Awake()
     {
         base.Awake();
-        puntos = 500;
+        scoreValue = 500;
     }
 
     protected override void OnActivate()
