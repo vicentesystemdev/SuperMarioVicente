@@ -2,13 +2,12 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 
 [InitializeOnLoad]
 public static class AplicarMejorasCarlaAcuatico
 {
     private const string ScenePath = "Assets/Scenes/2-2.unity";
-    private const string MarkerName = "MEJORAS_CARLA_ACUATICO_V2";
+    private const string MarkerName = "MEJORAS_CARLA_ACUATICO_V3";
 
     static AplicarMejorasCarlaAcuatico()
     {
@@ -58,11 +57,15 @@ public static class AplicarMejorasCarlaAcuatico
         if (oldMarkerV1 != null)
             Object.DestroyImmediate(oldMarkerV1);
 
+        GameObject oldMarkerV2 = FindRoot(scene, "MEJORAS_CARLA_ACUATICO_V2");
+        if (oldMarkerV2 != null)
+            Object.DestroyImmediate(oldMarkerV2);
+
         GameObject marker = new GameObject(MarkerName);
         SceneManager.MoveGameObjectToScene(marker, scene);
 
-        PrepararHud(scene);
-        PrepararTemporizador(scene);
+        QuitarSistemasDuplicados(scene);
+        PrepararConfiguracionNivel(scene);
         PrepararSalida(scene);
         PrepararCamara(scene);
         PrepararAgua(scene);
@@ -75,79 +78,33 @@ public static class AplicarMejorasCarlaAcuatico
         Restaurar(scene, original, alreadyOpen);
     }
 
-    private static void PrepararHud(Scene scene)
+    private static void QuitarSistemasDuplicados(Scene scene)
     {
-        GameObject hud = FindRoot(scene, "HUD Acuatico");
+        GameObject hudAnterior = FindRoot(scene, "HUD Acuatico");
+        if (hudAnterior != null)
+            Object.DestroyImmediate(hudAnterior);
 
-        if (hud == null)
-        {
-            hud = new GameObject(
-                "HUD Acuatico",
-                typeof(RectTransform),
-                typeof(Canvas),
-                typeof(CanvasScaler),
-                typeof(GraphicRaycaster),
-                typeof(HudAcuatico)
-            );
-
-            SceneManager.MoveGameObjectToScene(hud, scene);
-
-            Canvas canvas = hud.GetComponent<Canvas>();
-            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            canvas.sortingOrder = 20;
-
-            CanvasScaler scaler = hud.GetComponent<CanvasScaler>();
-            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-            scaler.referenceResolution = new Vector2(1920f, 1080f);
-            scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
-            scaler.matchWidthOrHeight = 0.5f;
-
-            GameObject bar = new GameObject("Barra Superior", typeof(RectTransform), typeof(Image));
-            bar.transform.SetParent(hud.transform, false);
-
-            RectTransform rect = bar.GetComponent<RectTransform>();
-            rect.anchorMin = new Vector2(0f, 1f);
-            rect.anchorMax = new Vector2(1f, 1f);
-            rect.pivot = new Vector2(0.5f, 1f);
-            rect.anchoredPosition = Vector2.zero;
-            rect.sizeDelta = new Vector2(0f, 150f);
-
-            Image image = bar.GetComponent<Image>();
-            image.color = new Color(0.015f, 0.04f, 0.12f, 0.72f);
-            image.raycastTarget = false;
-
-            CrearTexto("Mario Label", bar.transform, "MARIO", new Vector2(190f, -42f));
-            CrearTexto("Score Label", bar.transform, "000000", new Vector2(190f, -92f));
-            CrearTexto("Coins Label", bar.transform, "MONEDAS", new Vector2(570f, -42f));
-            CrearTexto("Coins Value", bar.transform, "X00", new Vector2(570f, -92f));
-            CrearTexto("World Label", bar.transform, "MUNDO 2-2", new Vector2(960f, -42f));
-            CrearTexto("Time Label", bar.transform, "TIEMPO", new Vector2(1460f, -42f));
-            CrearTexto("Time Value", bar.transform, "120", new Vector2(1460f, -92f));
-        }
-
-        Transform timeTransform = hud.transform.Find("Barra Superior/Time Value");
-        if (timeTransform != null)
-        {
-            PixelText existingTime = timeTransform.GetComponent<PixelText>();
-            if (existingTime != null)
-                existingTime.SetText("120");
-        }
+        GameObject relojAnterior = FindRoot(scene, "Temporizador Acuatico");
+        if (relojAnterior != null)
+            Object.DestroyImmediate(relojAnterior);
     }
 
-    private static void PrepararTemporizador(Scene scene)
+    private static void PrepararConfiguracionNivel(Scene scene)
     {
-        GameObject timer = FindRoot(scene, "Temporizador Acuatico");
+        GameObject settingsObject = FindRoot(scene, "Level Settings");
 
-        if (timer == null)
+        if (settingsObject == null)
         {
-            timer = new GameObject("Temporizador Acuatico");
-            SceneManager.MoveGameObjectToScene(timer, scene);
-            timer.AddComponent<TemporizadorAcuatico>();
+            settingsObject = new GameObject("Level Settings");
+            SceneManager.MoveGameObjectToScene(settingsObject, scene);
         }
 
-        TemporizadorAcuatico timerComponent = timer.GetComponent<TemporizadorAcuatico>();
-        if (timerComponent != null)
-            timerComponent.tiempoInicial = 120;
+        LevelSettings settings = settingsObject.GetComponent<LevelSettings>();
+        if (settings == null)
+            settings = settingsObject.AddComponent<LevelSettings>();
+
+        settings.timeLimit = 120;
+        settings.secondsPerTick = 0.5f;
     }
 
     private static void PrepararSalida(Scene scene)
