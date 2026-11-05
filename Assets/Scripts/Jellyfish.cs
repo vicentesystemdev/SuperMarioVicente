@@ -17,12 +17,6 @@ public class Jellyfish : WaterEnemy
     private float timer;
     private bool pulsing;
 
-    protected override void Awake()
-    {
-        base.Awake();
-        puntos = 300;
-    }
-
     protected override void Move()
     {
         timer -= Time.deltaTime;
