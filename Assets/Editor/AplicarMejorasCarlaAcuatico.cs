@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 public static class AplicarMejorasCarlaAcuatico
 {
     private const string ScenePath = "Assets/Scenes/2-2.unity";
-    private const string MarkerName = "MEJORAS_CARLA_ACUATICO_V3";
+    private const string MarkerName = "MEJORAS_CARLA_ACUATICO_V4";
 
     static AplicarMejorasCarlaAcuatico()
     {
@@ -61,17 +61,23 @@ public static class AplicarMejorasCarlaAcuatico
         if (oldMarkerV2 != null)
             Object.DestroyImmediate(oldMarkerV2);
 
+        GameObject oldMarkerV3 = FindRoot(scene, "MEJORAS_CARLA_ACUATICO_V3");
+        if (oldMarkerV3 != null)
+            Object.DestroyImmediate(oldMarkerV3);
+
         GameObject marker = new GameObject(MarkerName);
         SceneManager.MoveGameObjectToScene(marker, scene);
 
         QuitarSistemasDuplicados(scene);
         PrepararConfiguracionNivel(scene);
+        RecortarNivel(scene);
         PrepararSalida(scene);
         PrepararCamara(scene);
         PrepararAgua(scene);
         PrepararBloquesPoder(scene);
         PrepararFaunaNueva(scene);
         PrepararCorrientes(scene);
+        PrepararMusicaDinamica(scene);
 
         EditorSceneManager.MarkSceneDirty(scene);
         EditorSceneManager.SaveScene(scene);
@@ -92,6 +98,31 @@ public static class AplicarMejorasCarlaAcuatico
             Object.DestroyImmediate(relojAnterior);
     }
 
+    private static void RecortarNivel(Scene scene)
+    {
+        GameObject level = FindRoot(scene, "Level 2-2");
+
+        if (level == null)
+            return;
+
+        Transform underwater = level.transform.Find("Underwater");
+
+        if (underwater == null)
+            return;
+
+        for (int i = underwater.childCount - 1; i >= 0; i--)
+        {
+            Transform child = underwater.GetChild(i);
+            string name = child.name;
+
+            if (name.StartsWith("3 -") || name.StartsWith("4 -") || name.StartsWith("5 -") ||
+                name.StartsWith("6 -") || name.StartsWith("7 -") || name.StartsWith("8 -"))
+            {
+                Object.DestroyImmediate(child.gameObject);
+            }
+        }
+    }
+
     private static void PrepararConfiguracionNivel(Scene scene)
     {
         GameObject settingsObject = FindRoot(scene, "Level Settings");
@@ -106,7 +137,7 @@ public static class AplicarMejorasCarlaAcuatico
         if (settings == null)
             settings = settingsObject.AddComponent<LevelSettings>();
 
-        settings.timeLimit = 120;
+        settings.timeLimit = 110;
         settings.secondsPerTick = 0.5f;
     }
 
@@ -122,7 +153,7 @@ public static class AplicarMejorasCarlaAcuatico
             salida.AddComponent<SalidaAcuaticaCorta>();
         }
 
-        salida.transform.position = new Vector3(166f, -9f, 0f);
+        salida.transform.position = new Vector3(110f, -9f, 0f);
 
         BoxCollider2D collider = salida.GetComponent<BoxCollider2D>();
         if (collider != null)
@@ -147,6 +178,8 @@ public static class AplicarMejorasCarlaAcuatico
             {
                 scrolling.smoothTime = 0.12f;
                 scrolling.lookAhead = 2f;
+                scrolling.limitRight = true;
+                scrolling.rightLimit = 142f;
             }
 
             break;
@@ -166,6 +199,24 @@ public static class AplicarMejorasCarlaAcuatico
                 zone.logEvents = false;
             }
         }
+    }
+
+    private static void PrepararMusicaDinamica(Scene scene)
+    {
+        GameObject musicObject = FindRoot(scene, "Music");
+
+        if (musicObject == null)
+            return;
+
+        LevelMusic levelMusic = musicObject.GetComponent<LevelMusic>();
+        if (levelMusic != null)
+            levelMusic.theme = LevelMusic.Theme.Water;
+
+        MusicaAcuaticaDinamica dynamicMusic = musicObject.GetComponent<MusicaAcuaticaDinamica>();
+        if (dynamicMusic == null)
+            dynamicMusic = musicObject.AddComponent<MusicaAcuaticaDinamica>();
+
+        dynamicMusic.cambioX = 58f;
     }
 
     private static void PrepararCorrientes(Scene scene)
