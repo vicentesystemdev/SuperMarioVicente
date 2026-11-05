@@ -1,224 +1,278 @@
-<div align="center"><img src="Docs/Media/portada.png" alt="Portada ilustrada de Aventura Universitaria, juego de plataformas pixel art" width="100%" />SUPER MARIO BROS 2D
-AVENTURA UNIVERSITARIA · HITO 4
-Multimedia y Videojuegos · Ingeniería de Sistemas · UNIFRANZ La Paz · Gestión 2026
+<div align="center">
 
-UNITY 6   C#   2D PIXEL ART   4 MUNDOS   4 INTEGRANTES   TRABAJO GRUPAL
+# 🍄 SUPER MARIO BROS 2D
+### Aventura universitaria · Hito 4
 
-EXPLORAR LOS MUNDOS · EQUIPO · CÓMO JUGAR · INSTALAR · ENTREGA
-</div><div align="center">DEL MENÚ A LA VICTORIA — RECORRIDO ANIMADO
-<img src="Docs/Media/recorrido.gif" width="90%" alt="Animación conceptual que recorre menú, mundos, agua, castillo y final" />
-<sub>Animación ORIGINAL diseñada para el README. No es una captura del Editor ni demuestra funcionalidades de Unity.</sub>
-<br />
-<br />
-[ABRIR MAQUETA INTERACTIVA](VISTA_INTERACTIVA.html) · REPOSITORIO DEL PROYECTO
+**Proyecto grupal de Multimedia y Videojuegos · Ingeniería de Sistemas · UNIFRANZ La Paz · 2026**
 
-<sub>Para probar los botones y transiciones, descarga el repositorio y abre VISTA_INTERACTIVA.html en tu navegador. GitHub muestra el archivo fuente, no ejecuta la página dentro del README.</sub>
-</div>[!IMPORTANT]
-Estado: integración grupal en curso. En el main consultado existen los mundos 1-1, 1-2, 2-2, 8-4, GameOver y Victory. El menú inicial del Hito 4 y la verificación del HUD (tiempo/puntos/monedas) requieren pruebas en el fork del equipo. Las imágenes son conceptuales y las contribuciones asignadas no implican que todo esté validado.
+**Unity 6 (6000.3.16f1)** · **C#** · **Pixel art 2D** · **4 integrantes** · **7 escenas en `main`**
 
-El proyecto de un vistazo
+[🎮 Ver el menú](#-menú-interactivo) · [👥 Equipo y GitHub](#-equipo-y-aportaciones) · [✅ Consigna del docente](#-requisitos-del-hito-4) · [💻 Ejecutar](#-abrir-el-proyecto) · [📚 Créditos](#-créditos-y-procedencia)
+
+</div>
+
+> [!NOTE]
+> **Estado de referencia:** revisión de la rama [`main`](https://github.com/vicentesystemdev/SuperMarioVicente/tree/main) hasta el commit [`39d05203`](https://github.com/vicentesystemdev/SuperMarioVicente/commit/39d05203), el **5 de noviembre de 2026**. La existencia de escenas y scripts en GitHub confirma su incorporación al código, **no reemplaza las pruebas manuales en Unity o Windows**. Las mejoras particulares de Marcelo en `develop-marcelo` se distinguen de las ya integradas en `main`.
+
+## 📖 Sobre el proyecto
+
+Partimos del repositorio público facilitado en la materia para ampliar un juego de plataformas 2D inspirado en *Super Mario Bros.*. Primero se adaptó la base a **Unity 6** y se añadieron niveles y pantallas; posteriormente, el equipo trabajó las mejoras del **Hito 4: SUPER MARIO MANUAL**: menú interactivo, música ambiental, efectos sonoros y contadores de juego.
+
+- **Fork utilizado por el equipo:** [`vicentesystemdev/SuperMarioVicente`](https://github.com/vicentesystemdev/SuperMarioVicente)
+- **Repositorio proporcionado:** [`Jesusbautistah/SUPER-MArio`](https://github.com/Jesusbautistah/SUPER-MArio)
+- **Tutorial técnico de referencia:** [`zigurous/unity-super-mario-tutorial`](https://github.com/zigurous/unity-super-mario-tutorial)
+- **Plataforma de desarrollo y compilación:** Unity 6; compilación prevista para Windows x64.
+
+## ✅ Requisitos del Hito 4
+
+| Lo solicitado por el docente | Evidencia existente en `main` | Estado de verificación |
+|---|---|---|
+| Fork público grupal | Repositorio público del equipo, con ramas, colaboradores y commits. | **Disponible** |
+| Escena inicial de menú interactivo | [`MainMenu.unity`](Assets/Scenes/MainMenu.unity), [`Hito4MenuController.cs`](Assets/Hito4PixelUI/Scripts/Hito4MenuController.cs); menú en índice 0 del build. | **Código integrado**; probar opciones en Unity |
+| Sonido ambiente | [`LevelMusic.cs`](Assets/Scripts/LevelMusic.cs), [`MarioAudio.cs`](Assets/Scripts/MarioAudio.cs), recursos de audio y ajustes. | **Código y recursos presentes**; escuchar en los niveles |
+| SFX: salto, pisotón, power-up, daño y muerte | [`Sfx.cs`](Assets/Scripts/Sfx.cs), [`ChiptuneSynth.cs`](Assets/Scripts/ChiptuneSynth.cs) y llamadas desde los eventos del juego. | **Implementación localizada**; probar los cinco eventos |
+| Tiempo restante | [`GameManager.cs`](Assets/Scripts/GameManager.cs), [`LevelSettings.cs`](Assets/Scripts/LevelSettings.cs) y [`GameHud.cs`](Assets/Scripts/GameHud.cs). | **Código integrado**; verificar cuenta regresiva |
+| Puntaje por monedas y enemigos | Suma de puntos en `GameManager`, `Goomba`, `Koopa`, `WaterEnemy` y otros eventos. | **Código integrado**; verificar cantidades y no duplicación |
+| Contador de monedas | `GameManager.AddCoin()` y columna de monedas en `GameHud`. | **Código integrado**; verificar actualización |
+
+> [!IMPORTANT]
+> El ejemplo del docente ilustra un menú clásico con opciones para iniciar el juego. **Nuestra implementación usa un menú ampliado** con Jugar, selección de mundos, Controles, Créditos y Ajustes. Las opciones **Jugar** y las tarjetas de nivel inician partidas; las otras opciones abren sus respectivas pantallas. Corresponde al equipo confirmar con el docente si exige reproducir exactamente las dos opciones de la imagen de referencia.
+
+## 🎮 Menú interactivo
+
+<div align="center">
 <table>
 <tr>
-<td align="center"><strong>04</strong><br /><sub>MUNDOS</sub></td>
-<td align="center"><strong>04</strong><br /><sub>INTEGRANTES</sub></td>
-<td align="center"><strong>06</strong><br /><sub>ESCENAS EXISTENTES</sub></td>
-<td align="center"><strong>06</strong><br /><sub>SFX A COMPROBAR*</sub></td>
+<td width="50%" align="center"><img src="Assets/Hito4PixelUI/Art/01_MenuPrincipal.png" width="100%" alt="Arte del menú principal incorporado por Víctor" /><br /><sub>Menú principal</sub></td>
+<td width="50%" align="center"><img src="Assets/Hito4PixelUI/Art/02_SeleccionNiveles.png" width="100%" alt="Arte de la pantalla de selección de niveles" /><br /><sub>Selección de mundos</sub></td>
 </tr>
-</table><sub>* La consigna exige sonidos de salto, pisotón, power-up, daño y muerte, además de sonido ambiente; se detallan las verificaciones más adelante.</sub>
+</table>
+<sub>Estas imágenes son **recursos gráficos incluidos en el proyecto**, no capturas de una partida ejecutándose.</sub>
+</div>
 
-Ruta de lectura: 01 · Mundos / 02 · Flujo / 03 · Equipo / 04 · Controles / 05 · Audio y HUD / 06 · Instalación / 07 · Entrega / 08 · Créditos
+El trabajo de **Víctor** está incorporado a la rama `main` y utiliza [`Assets/Hito4PixelUI/`](Assets/Hito4PixelUI/) y `Assets/Scenes/MainMenu.unity`.
 
-<a id="mundos"></a>
-01 / ELIGE TU MUNDO
-Haz clic en las tarjetas ilustradas para ver los detalles técnicos de cada nivel.
-<table>
-<tr>
-<td width="50%" align="center">
-<a href="#mundo-11"><img src="Docs/Media/mundo-1-1.png" alt="Mundo 1-1: Pradera" width="100%" /></a>
-<br /><strong>1-1 · PRADERA</strong><br /><sub>Escenario base / plataformas</sub>
-</td>
-<td width="50%" align="center">
-<a href="#mundo-12"><img src="Docs/Media/mundo-1-2.png" alt="Mundo 1-2: Subterráneo" width="100%" /></a>
-<br /><strong>1-2 · SUBTERRÁNEO</strong><br /><sub>Túneles / obstáculos</sub>
-</td>
-</tr>
-<tr>
-<td align="center">
-<a href="#mundo-22"><img src="Docs/Media/mundo-2-2.png" alt="Mundo 2-2: Acuático" width="100%" /></a>
-<br /><strong>2-2 · ACUÁTICO</strong><br /><sub>Carla / natación</sub>
-</td>
-<td align="center">
-<a href="#mundo-84"><img src="Docs/Media/mundo-8-4.png" alt="Mundo 8-4: Castillo" width="100%" /></a>
-<br /><strong>8-4 · CASTILLO FINAL</strong><br /><sub>Marcelo / desafío final</sub>
-</td>
-</tr>
-</table><details id="mundo-11">
-<summary><strong>1-1 · PRADERA — Detalles del nivel inicial</strong></summary>
-Entrada al juego con desplazamiento, saltos, enemigos, bloques y monedas. Escena Assets/Scenes/1-1.unity.
-</details><details id="mundo-12">
-<summary><strong>1-2 · SUBTERRÁNEO — Detalles del nivel</strong></summary>
-Escenario de rutas bajo tierra, obstáculos y música de ambiente. Escena Assets/Scenes/1-2.unity; generador Assets/Editor/UndergroundLevelBuilder.cs.
-</details><details id="mundo-22">
-<summary><strong>2-2 · ACUÁTICO — Detalles del nivel de Carla</strong></summary>
-Natación, gravedad adaptada, fauna submarina y burbujas. Escena Assets/Scenes/2-2.unity; scripts WaterZone.cs, WaterEnemy.cs y PlayerMovement.cs. Responsable grupal: Carla.
-</details><details id="mundo-84">
-<summary><strong>8-4 · CASTILLO FINAL — Detalles del nivel de Marcelo</strong></summary>
-Lava, trampas, mecánicas del jefe y final de la aventura. Escena Assets/Scenes/8-4.unity; scripts Boss.cs, BossArena.cs y CastleLevelBuilder.cs. Responsable grupal: Marcelo.
-</details>
-<a id="flujo"></a>
-02 / UNA AVENTURA, DE PRINCIPIO A FIN
-La secuencia siguiente es el flujo objetivo del menú grupal, no una certificación de que cada conexión ya esté probada.
+**Opciones implementadas en código:** Jugar, selección de `1-1` / `1-2` / `2-2` / `8-4`, Controles, Créditos, Ajustes de música y SFX, control de volumen, salida del juego y pausa con **Esc** o **P** (Continuar, Reiniciar o Menú). Las preferencias de audio se guardan con `PlayerPrefs`.
+
+## 🌍 Mundos y pantallas
+
+| Escena en `main` | Descripción | Contexto del desarrollo |
+|---|---|---|
+| [`MainMenu`](Assets/Scenes/MainMenu.unity) | Inicio, navegación y ajustes. | Mejoras grupales de **Víctor**. |
+| [`1-1`](Assets/Scenes/1-1.unity) | Pradera: plataformas, bloques, monedas y enemigos. | Nivel base y ajustes de integración. |
+| [`1-2`](Assets/Scenes/1-2.unity) | Zona subterránea, enemigos, tuberías y salida. | Ampliación previa a la etapa grupal. |
+| [`2-2`](Assets/Scenes/2-2.unity) | Agua, natación, criaturas y obstáculos acuáticos. | Base previa, después mejorada por **Carla**. |
+| [`8-4`](Assets/Scenes/8-4.unity) | Castillo, trampas, lava y enfrentamiento final. | **Base presente en `main`**; mejoras grupales de **Marcelo** en rama separada. |
+| [`GameOver`](Assets/Scenes/GameOver.unity) | Resultado de perder todas las vidas. | Sistema base de vidas previo a la etapa grupal. |
+| [`Victory`](Assets/Scenes/Victory.unity) | Pantalla de victoria final. | Escena base previa a la etapa grupal. |
+
 ```mermaid
 flowchart LR
-    A[Menú principal] --> B{Elegir opción}
-    B --> C[Jugar 1-1]
-    B --> D[Elegir mundo]
-    B --> E[Controles]
-    B --> F[Equipo y sonido]
-    E --> A
-    F --> A
-    D --> W11[Mundo 1-1]
-    D --> W12[Mundo 1-2]
-    D --> W22[Mundo 2-2]
-    D --> W84[Mundo 8-4]
-    C --> W11
-    W11 --> R{Resultado}
-    W12 --> R
-    W22 --> R
-    W84 --> R
-    R -->|Sin vidas| G[Game Over]
-    R -->|Objetivo completado| V[Victoria]
-    G --> T[Reintentar]
-    V --> T
-    T --> A
-    classDef inicio fill:#ffd565,color:#15324f,stroke:#15324f,stroke-width:2px;
-    classDef pantalla fill:#b5e4f1,color:#12334d,stroke:#26617a;
-    classDef final fill:#f0a88a,color:#23324a,stroke:#8b3f42;
-    class A,C inicio;
-    class W11,W12,W22,W84 pantalla;
-    class G,V final;
+    A[MainMenu] --> B[1-1]
+    B --> C[1-2]
+    C --> D[2-2]
+    D --> E[8-4]
+    E --> F[Victory]
+    B -. Sin vidas .-> G[GameOver]
+    C -. Sin vidas .-> G
+    D -. Sin vidas .-> G
+    E -. Sin vidas .-> G
 ```
+
+<sub>El diagrama representa la **ruta de juego prevista**. La conectividad de todas las tuberías, banderas, menús y pantallas debe comprobarse jugando la secuencia completa.</sub>
+
+## 👥 Equipo y aportaciones
+
+La siguiente tabla relaciona los **nombres del grupo** con los **usuarios que figuran en el historial de commits de GitHub**. La asignación de un módulo y la incorporación efectiva a `main` no son necesariamente lo mismo.
+
+| Integrante | Usuario de GitHub | Responsabilidad y aportes | Situación respecto a `main` |
+|---|---|---|---|
+| **Marcelo Josué Escobar Chipana** | [**@Josue-EC16**](https://github.com/Josue-EC16) | Castillo `8-4`: jefe, velocidad, plataformas, colisiones y música del nivel. | Castillo base en `main`; **mejoras propias en `develop-marcelo`**. |
+| **Víctor Grover Asturizaga Plata** | [**@Developer-vic1**](https://github.com/Developer-vic1) | Menú interactivo, selector de niveles, controles, créditos, ajustes, pausa, audio y correcciones de `1-1`. | **Aportes incorporados en `main`**. |
+| **Vicente Óscar Claros Mamani** | [**@vicentesystemdev**](https://github.com/vicentesystemdev) | HUD (puntos, monedas, mundo, tiempo), lógica de puntuación, pantalla intermedia de vidas y fanfarria de bandera; integración general. | **Aportes incorporados en `main`**. |
+| **Carla Valeria Encinas Cano** | [**@VarlaCdev20**](https://github.com/VarlaCdev20) | Mejoras acuáticas `2-2`: natación, enemigos, corrientes, música dinámica y compatibilidad con el HUD. | **Aportes incorporados en `main`**. |
+
 <details>
-<summary><strong>Explorar las pantallas de la interfaz</strong></summary>Pantalla	Acción del jugador	Resultado previsto
-Menú principal	Jugar / mundos / instrucciones	Navegación clara por teclado y ratón.
-Seleccionar nivel	Elegir 1-1, 1-2, 2-2 o 8-4	Carga directa de la escena.
-Cómo jugar	Consultar movimiento, salto y natación	Guía breve con retorno.
-Créditos	Abrir el equipo	Nombres y módulos de los cuatro estudiantes.
-Sonido	Alternar o ajustar volumen	Feedback visual y audible.
-En partida	Recoger monedas, vencer enemigos, avanzar	Cambios en HUD y efectos de sonido.
-Pausa / Game Over / Victoria	Retomar, reintentar o salir	Continuidad sin bloqueos.
+<summary><strong>🎮 Víctor — Menú, interfaz y sonido</strong></summary>
 
+- Integró el paquete de interfaz [`Assets/Hito4PixelUI/`](Assets/Hito4PixelUI/), con imágenes, controlador del menú y menú de pausa.
+- Implementó navegación por pantallas, inicio de partida en los cuatro mundos y preferencias persistentes de música, SFX y volumen.
+- Integró recursos de sonido y realizó correcciones de colisión en `1-1`.
+- **Archivos principales:** [`Hito4MenuController.cs`](Assets/Hito4PixelUI/Scripts/Hito4MenuController.cs), [`Hito4PauseController.cs`](Assets/Hito4PixelUI/Scripts/Hito4PauseController.cs), [`Hito4AudioSettings.cs`](Assets/Hito4PixelUI/Scripts/Hito4AudioSettings.cs), [`MainMenu.unity`](Assets/Scenes/MainMenu.unity), [`MarioAudio.cs`](Assets/Scripts/MarioAudio.cs).
+- **Evidencia de commits:** [`85360ecd` — menú completado, sonidos y UI](https://github.com/vicentesystemdev/SuperMarioVicente/commit/85360ecd) y [`bab1b883` — incorporación de sonidos](https://github.com/vicentesystemdev/SuperMarioVicente/commit/bab1b883).
 
-</details><a id="equipo"></a>
-03 / QUIÉN HACE QUÉ
-<div align="center"><img src="Docs/Media/equipo.png" width="100%" alt="Tarjetas originales del equipo: Marcelo, Víctor, Vicente y Carla" /></div><table>
-<tr><th>INTEGRANTE</th><th>APORTE DEL HITO 4</th></tr>
-<tr><td><strong>Marcelo Josué Escobar Chipana</strong></td><td>Castillo, obstáculos y último nivel <code>8-4</code>.</td></tr>
-<tr><td><strong>Víctor Grover Asturizaga Plata</strong></td><td>Menús, navegación, sonido ambiente y SFX.</td></tr>
-<tr><td><strong>Vicente Óscar Claros Mamani</strong></td><td>Pantalla y sistema de vidas; canciones y pantalla de victoria.</td></tr>
-<tr><td><strong>Carla Valeria Encinas Cano</strong></td><td>Nivel acuático <code>2-2</code>, natación y entorno submarino.</td></tr>
-</table><details>
-<summary><strong>Detalle técnico: Marcelo y el castillo</strong></summary>Archivos relacionados: Assets/Scenes/8-4.unity, Assets/Scripts/Boss.cs, BossArena.cs, Assets/Prefabs/Castle/. 
-
-Por verificar: completar el recorrido sin bloqueos, comprobar peligros, condiciones de victoria y transición al final. La existencia de la escena no demuestra que todas esas pruebas ya se aprobaron.
-</details><details>
-<summary><strong>Detalle técnico: Víctor y los menús / sonidos</strong></summary>
-Objetivo: integrar MenuPrincipal.unity con el selector de mundos, guía de juego, créditos y sonido. Base técnica existente: ChiptuneSynth.cs, Sfx.cs y LevelMusic.cs.
-
-Por verificar: entrada desde Build Profiles, enlaces de botones, sonidos de salto/pisotón/power-up/daño/muerte y música ambiental; registrar evidencia real del Editor.
-</details><details>
-<summary><strong>Detalle técnico: Vicente, vidas y victoria</strong></summary>
-Archivos relacionados: Assets/Scripts/GameManager.cs, GameOverScreen.cs, VictoryScreen.cs, VictoryGoal.cs, Assets/Scenes/GameOver.unity y Victory.unity.
-
-Por verificar: descuento correcto de vidas, Game Over, música de victoria, estadísticas finales y botones de reinicio/regreso.
-</details><details>
-<summary><strong>Detalle técnico: Carla y el nivel acuático</strong></summary>
-Archivos relacionados: Assets/Scenes/2-2.unity, WaterLevelBuilder.cs, WaterZone.cs, WaterEnemy.cs, PlayerMovement.cs, Assets/Prefabs/Water/.
-
-Por verificar: entrada y salida del agua, natación, burbujas, enemigos acuáticos, obstáculos y salida del nivel.
 </details>
-<a id="controles"></a>
-04 / APRENDE A JUGAR
-MOVIMIENTO	TECLA	MECÁNICA
-Izquierda / derecha	A D / ← →	Desplazamiento horizontal.
-Saltar	ESPACIO	Superar obstáculos y enemigos.
-Nadar	ESPACIO	Impulsos sucesivos dentro del agua.
-Entrar en tubería	S	Tuberías habilitadas.
-Salida lateral	D	Interacciones que lo permitan.
 
+<details>
+<summary><strong>🌊 Carla — Nivel acuático 2-2</strong></summary>
 
-Tipografía propuesta para la interfaz: títulos con estética pixel art y contenido con fuentes sans serif de alta legibilidad. Pixelify Sans es una referencia visual opcional para Unity; el README y la demo no necesitan descargarla para mostrarse. Se recomienda limitar la tipografía retro a títulos y botones y mantener explicaciones claras y alineadas.
+- Mejoró la dinámica de nado, fauna submarina, obstáculos y longitud/distribución del nivel.
+- Añadió ajustes de música acuática, enemigos adicionales, corrientes e interacción con indicadores de puntos y monedas.
+- **Archivos representativos:** [`AplicarMejorasCarlaAcuatico.cs`](Assets/Editor/AplicarMejorasCarlaAcuatico.cs), [`WaterZone.cs`](Assets/Scripts/WaterZone.cs), [`WaterEnemy.cs`](Assets/Scripts/WaterEnemy.cs), [`MusicaAcuaticaDinamica.cs`](Assets/Scripts/MusicaAcuaticaDinamica.cs) y [`2-2.unity`](Assets/Scenes/2-2.unity).
+- **Evidencia:** [`66527835` — mejorar nivel acuático](https://github.com/vicentesystemdev/SuperMarioVicente/commit/66527835), [`b7bbe165` — música dinámica](https://github.com/vicentesystemdev/SuperMarioVicente/commit/b7bbe165), [PR #4 — integración a main](https://github.com/vicentesystemdev/SuperMarioVicente/pull/4).
 
-<a id="audio-y-hud"></a>
-05 / HUD Y SONIDO: LO QUE HAY Y LO QUE FALTA
-<div align="center"><img src="Docs/Media/sistemas.png" width="100%" alt="Composición conceptual del HUD con vidas, monedas, puntos, tiempo y sonido" /><sub>Visualización de referencia, no captura de contadores implementados.</sub></div><details open>
-<summary><strong>Sistema de audio</strong></summary>El repositorio contiene ChiptuneSynth.cs, Sfx.cs y LevelMusic.cs; hay clips sintetizados de salto, pisotón, power-up, muerte, natación, música acuática, castillo y victoria. Pendiente: escuchar y verificar cada evento solicitado en su escena, especialmente el SFX de daño.
-</details><details>
-<summary><strong>Vidas, monedas, puntaje y tiempo</strong></summary>- Vidas: GameManager.cs establece tres vidas y controla el final de partida.
-- Monedas: GameManager.AddCoin() lleva el conteo y concede vida extra cada cien monedas.
-- Puntaje: se requiere verificar o implementar la suma por monedas y enemigos y mostrarla en el HUD.
-- Tiempo: se requiere verificar o implementar un temporizador visible por nivel.
-Los valores del gráfico son ejemplos de diseño, no lecturas reales de una partida.
 </details>
-<a id="instalacion"></a>
-06 / INSTALACIÓN EN 3 PASOS
-<details open>
-<summary><strong>PASO 01 — Clonar el proyecto</strong></summary>Requiere Unity Hub, Unity 6 6000.3.16f1 y Git.
+
+<details>
+<summary><strong>🧮 Vicente — HUD, puntuación, vidas y audio de bandera</strong></summary>
+
+- Implementó el **HUD persistente** con puntuación, monedas, mundo y temporizador visible.
+- Incorporó puntos por monedas y enemigos, temporizador de nivel, bonificación por tiempo y protección frente a puntuaciones duplicadas en eventos tratados.
+- Añadió una **pantalla intermedia** con las vidas restantes cuando Mario muere, antes de reiniciar el nivel. Con cero vidas se carga `GameOver`.
+- Mejoró la secuencia de bandera: efecto al tocar el mástil, descenso, **fanfarria de nivel completado** y transición siguiente. Esta fanfarria **no equivale a la música de la escena `Victory`**.
+- **Archivos principales:** [`GameHud.cs`](Assets/Scripts/GameHud.cs), [`GameManager.cs`](Assets/Scripts/GameManager.cs), [`LevelSettings.cs`](Assets/Scripts/LevelSettings.cs), [`LivesScreen.cs`](Assets/Scripts/LivesScreen.cs), [`FlagPole.cs`](Assets/Scripts/FlagPole.cs), [`ChiptuneSynth.cs`](Assets/Scripts/ChiptuneSynth.cs).
+- **Documentación:** [`Hito4_HUD_Vicente.md`](Docs/Hito4_HUD_Vicente.md), [`Hito4_Vidas_Y_Audio_Vicente.md`](Docs/Hito4_Vidas_Y_Audio_Vicente.md).
+- **Evidencia:** [PR #2 — HUD, puntuación y tiempo](https://github.com/vicentesystemdev/SuperMarioVicente/pull/2), [PR #3 — vidas y fanfarria](https://github.com/vicentesystemdev/SuperMarioVicente/pull/3).
+
+**Trabajo previo al Hito 4 grupal:** Vicente preparó la migración a Unity 6 y las primeras versiones de las escenas adicionales, el sistema GameOver y el castillo base. Estas contribuciones iniciales no deben confundirse con las mejoras de los demás estudiantes sobre esos sistemas.
+
+</details>
+
+<details>
+<summary><strong>🏰 Marcelo — Mejoras del castillo 8-4</strong></summary>
+
+- Desarrolló en su rama ajustes de movimiento/velocidad, colisiones, plataformas, comportamiento del jefe y música del nivel final.
+- **Rama de trabajo encontrada:** [`develop-marcelo`](https://github.com/vicentesystemdev/SuperMarioVicente/tree/develop-marcelo).
+- **Commits de referencia:** [`23a28a24` — velocidad y colisiones](https://github.com/vicentesystemdev/SuperMarioVicente/commit/23a28a24), [`78c9eff4` — música integrada en escena](https://github.com/vicentesystemdev/SuperMarioVicente/commit/78c9eff4).
+- **Estado:** el castillo base `8-4` ya está en `main`, pero **no se han identificado esos commits de Marcelo como integrados en `main`** en esta revisión. Se deben fusionar y probar antes de presentarlos como parte de la versión principal.
+
+</details>
+
+## 🧮 HUD, vidas y puntuación
+
+En [`GameManager.cs`](Assets/Scripts/GameManager.cs) existen los siguientes valores de puntuación:
+
+| Acción | Puntos definidos |
+|---|---:|
+| Moneda | 200 |
+| Pisotón | 100 |
+| Enemigo eliminado | 200 |
+| Power-up | 1.000 |
+| Jefe final | 5.000 |
+| Cada unidad de tiempo restante al completar nivel | 50 |
+
+- La partida comienza con **3 vidas**.
+- El tiempo por defecto es **400 unidades**, configurable por escena en `LevelSettings`.
+- El HUD se crea en tiempo de ejecución y se mantiene entre escenas mediante `GameManager`.
+- Al recoger **100 monedas**, el contador se reinicia y se suma una vida extra.
+- La pantalla de vidas se muestra entre intentos; `GameOver` se utiliza al agotar las vidas.
+
+## 🔊 Audio y efectos
+
+El proyecto combina música y clips importados en [`Assets/Resources/MarioAudio/`](Assets/Resources/MarioAudio/) con efectos generados mediante [`ChiptuneSynth.cs`](Assets/Scripts/ChiptuneSynth.cs). Los puntos de reproducción están repartidos entre los scripts de jugador, enemigos, elementos, nivel y menú.
+
+| Evento requerido | Referencia de implementación | Comprobación de entrega |
+|---|---|---|
+| Ambiente | `LevelMusic`, `MarioAudio`, ajustes del menú | Escuchar entrada y cambio de nivel |
+| Salto | `ChiptuneSynth.Jump` | Saltar en `1-1` |
+| Pisotón | `ChiptuneSynth.Stomp` | Derrotar Goomba saltando |
+| Power-up | `ChiptuneSynth.PowerUpCollect` | Recoger un champiñón |
+| Daño | `Player.Shrink()` → `ChiptuneSynth.Damage` | Recibir golpe con Mario grande |
+| Muerte | `GameManager.ResetLevel()` → `DeathJingle` | Perder una vida |
+| Bandera / final de nivel | `FlagPole` → `FlagTouch`, `Flag`, `LevelClear` | Completar un nivel con bandera |
+
+> **Nota de atribución de audio:** hay archivos MP3 importados al proyecto y efectos sintetizados. No se afirma que todos sean composiciones originales del equipo. Se debe comprobar el origen y los permisos de cada pista antes de redistribuir materiales protegidos.
+
+## 🎮 Controles
+
+| Acción | Control |
+|---|---|
+| Caminar | `A` / `D` o flechas izquierda/derecha |
+| Saltar | `Espacio` |
+| Nadar | Pulsaciones sucesivas de `Espacio` dentro del agua |
+| Tubería vertical | `S`, donde esté habilitada |
+| Entrada lateral | `D`, donde esté habilitada |
+| Menú | Ratón, flechas y confirmación con teclado |
+| Volver de una pantalla del menú | `Esc` o botón correspondiente |
+| Pausar / reanudar | `Esc` o `P` durante el nivel |
+
+## 💻 Abrir el proyecto
+
+**Requisitos:** Unity Hub, **Unity Editor 6000.3.16f1** y Git. Para exportar a Windows, disponer del soporte de compilación correspondiente.
+
+```powershell
 git clone https://github.com/vicentesystemdev/SuperMarioVicente.git
 cd SuperMarioVicente
-</details><details>
-<summary><strong>PASO 02 — Abrir y ejecutar una escena</strong></summary>1. En Unity Hub selecciona Add project from disk y abre la carpeta clonada.
-2. Confirma la versión 6000.3.16f1.
-3. Abre Assets/Scenes/1-1.unity y pulsa Play para comprobar el proyecto existente.
-4. Comprueba las otras escenas desde Assets/Scenes/.
-</details><details>
-<summary><strong>PASO 03 — Integrar el menú y exportar</strong></summary>1. Incorpora el trabajo de Víctor (MenuPrincipal.unity) al fork grupal.
-2. Configura File > Build Profiles > Scene List, con el menú en índice 0 y niveles habilitados.
-3. Verifica cada botón, audio, contador y transición con Play.
-4. Compila para Windows y prueba el .exe junto a su carpeta *_Data.
-Esta documentación no instala ni modifica el proyecto Unity automáticamente.
-</details>
-<a id="entrega"></a>
-07 / TRABAJO GRUPAL Y ENTREGA
+git switch main
+```
+
+1. En Unity Hub, selecciona **Add project from disk** y abre la carpeta clonada.
+2. Comprueba que se utiliza Unity **6000.3.16f1**. Deja terminar la importación de paquetes, incluido **Unity UI (uGUI)**.
+3. Abre **File → Build Profiles → Scene List**. La lista ya registrada en `main` comienza por `MainMenu`, seguido de `1-1`, `GameOver`, `1-2`, `2-2`, `8-4` y `Victory`.
+4. Abre [`MainMenu.unity`](Assets/Scenes/MainMenu.unity), pulsa **Play** y verifica las opciones del menú.
+5. Para un ejecutable Windows x64: **File → Build Profiles → Windows → Build**; conserva el `.exe`, su carpeta `*_Data` y los archivos complementarios. **El ejecutable debe probarse fuera de Unity.**
+
+**No regeneres el menú ni los niveles sin necesidad:** las escenas ya están en el repositorio y los generadores pueden modificar contenido existente.
+
+## 🌿 Flujo de colaboración con Git
+
+- [`main`](https://github.com/vicentesystemdev/SuperMarioVicente/tree/main): rama principal que se revisa para la entrega.
+- [`develop`](https://github.com/vicentesystemdev/SuperMarioVicente/tree/develop): integración de trabajo grupal.
+- `feature/*` y otras ramas de integrante: desarrollo de cambios antes de fusionarlos.
+
 ```mermaid
 flowchart LR
- A[Crear fork grupal] --> B[Trabajar por ramas]
- B --> C[Probar cada modulo]
- C --> D[Integrar en el fork]
- D --> E[Compilar para Windows]
- E --> F[Capturar evidencia real]
- F --> G[Publicar en el foro]
+    A[Feature del integrante] --> B[Commit + push]
+    B --> C[Pull Request]
+    C --> D[develop]
+    D --> E[Revisión y pruebas]
+    E --> F[main]
 ```
-<details>
-<summary><strong>Lista de revisión del Hito 4</strong></summary>- [ ] El menú aparece al iniciar el juego.
-- [ ] Jugar y seleccionar nivel funcionan.
-- [ ] Música de fondo y SFX de salto, pisotón, power-up, daño y muerte están probados.
-- [ ] El HUD muestra tiempo, monedas y puntaje de forma coherente.
-- [ ] La puntuación suma monedas y enemigos eliminados.
-- [ ] Se puede completar el nivel acuático y el castillo.
-- [ ] Las vidas, Game Over, canción de victoria y reinicio funcionan.
-- [ ] El ejecutable Windows inicia correctamente fuera de Unity.
-- [ ] El fork grupal es público y cada integrante publica captura real de Unity, dificultad, solución y su aporte favorito.
-Estas casillas no están marcadas como completadas porque requieren pruebas del grupo.
-</details><details>
-<summary><strong>Git: trabajo por ramas</strong></summary>git switch -c feature/hito4-mi-modulo
-# Agrega y prueba tu aporte
-git add Assets/ README.md Docs/
-git commit -m "feat(hito4): integrar modulo grupal"
-git push -u origin feature/hito4-mi-modulo
-Usa una rama nueva y abre un pull request al fork del grupo; no reemplaces main sin revisión.
-</details>
-<a id="creditos"></a>
-08 / CRÉDITOS Y LICENCIAS
-Este es un trabajo académico grupal no comercial basado en un proyecto preexistente. La autoría del grupo corresponde a sus aportes, no al código completo ni a todos los recursos originales.
 
-Fuentes de referencia: SuperMarioVicente · Jesusbautistah/SUPER-MArio · Zigurous Unity Mario Tutorial. Super Mario Bros, Mario y los personajes y materiales originales asociados pertenecen a Nintendo y a sus titulares. La referencia pública no equivale a una licencia de reutilización.
+Para comprobar la autoría y el trabajo compartido, consulta [los commits de `main`](https://github.com/vicentesystemdev/SuperMarioVicente/commits/main/), [las ramas](https://github.com/vicentesystemdev/SuperMarioVicente/branches) y [los Pull Requests](https://github.com/vicentesystemdev/SuperMarioVicente/pulls?q=is%3Apr+is%3Amerged).
 
-El arte para este README (Docs/Media) se diseñó específicamente como material conceptual. No sustituye las capturas reales que exige el docente.
-<div align="center">CUATRO APORTES. UNA MISMA AVENTURA.
+## 📝 Evidencia individual para el foro
 
-Marcelo Josué Escobar Chipana · Víctor Grover Asturizaga Plata
-Vicente Óscar Claros Mamani · Carla Valeria Encinas Cano
+El docente solicita una **publicación por estudiante**, además del trabajo grupal. Cada publicación debe incluir:
 
-Volver al inicio · Explorar mundos · [Demostración local](VISTA_INTERACTIVA.html)
+- [ ] Una descripción breve de las funcionalidades realmente agregadas al fork.
+- [ ] Una dificultad técnica encontrada durante la implementación.
+- [ ] La característica favorita y por qué fue interesante desarrollarla.
+- [ ] Una captura **real del juego en Unity**, coherente con la explicación.
+- [ ] El enlace al [fork público del equipo](https://github.com/vicentesystemdev/SuperMarioVicente).
+
+**La captura del foro no debe sustituirse por el arte conceptual del menú incluido más arriba.** El archivo de compilación Windows fue parte de otra evaluación; la consigna de este foro solicita enlace del fork, evidencia y explicación individual.
+
+### Verificación final pendiente
+
+- [ ] Abrir `MainMenu` desde el inicio y recorrer las pantallas de Víctor.
+- [ ] Verificar Jugar, selección de mundos, pausa y ajustes de volumen/SFX.
+- [ ] Probar saltos, pisotones, power-up, daño, muerte y ambiente.
+- [ ] Confirmar que puntos, monedas y tiempo se actualizan correctamente.
+- [ ] Probar pantalla de vidas y `GameOver` hasta agotar las tres vidas.
+- [ ] Revisar banderas, tuberías y transiciones de los cuatro mundos.
+- [ ] Validar la integración del castillo actualizado de Marcelo cuando se fusione.
+- [ ] Completar una partida y verificar `Victory`.
+- [ ] Capturar evidencias reales y, si se entrega ejecutable, probar Windows x64.
+
+## 📚 Documentación técnica
+
+| Documento | Contenido |
+|---|---|
+| [`Hito4_HUD_Vicente.md`](Docs/Hito4_HUD_Vicente.md) | HUD, puntuación y temporizador |
+| [`Hito4_Vidas_Y_Audio_Vicente.md`](Docs/Hito4_Vidas_Y_Audio_Vicente.md) | Pantalla de vidas y fanfarria de bandera |
+| [`Mejora1_NivelSubterraneo.md`](Docs/Mejora1_NivelSubterraneo.md) | Nivel `1-2` |
+| [`Mejora2_NivelAcuatico.md`](Docs/Mejora2_NivelAcuatico.md) | Base del nivel `2-2` |
+| [`Mejora3_GameOver.md`](Docs/Mejora3_GameOver.md) | Sistema inicial de vidas y GameOver |
+| [`Mejora4_CastilloBowser.md`](Docs/Mejora4_CastilloBowser.md) | Base del castillo final |
+| [`Assets/Hito4PixelUI/README.md`](Assets/Hito4PixelUI/README.md) | Menú y pausa integrados por Víctor |
+
+## ©️ Créditos y procedencia
+
+- **Nintendo y respectivos titulares:** *Super Mario Bros.*, Mario, Bowser, marcas, personajes, diseños y materiales originales asociados.
+- **[Zigurous](https://github.com/zigurous/unity-super-mario-tutorial):** tutorial y base técnica de Unity a partir de la cual procede el proyecto.
+- **[Jesusbautistah](https://github.com/Jesusbautistah/SUPER-MArio):** repositorio público compartido como punto de partida de la actividad.
+- **Equipo UNIFRANZ:** ampliaciones y mejoras académicas de [Marcelo](https://github.com/Josue-EC16), [Víctor](https://github.com/Developer-vic1), [Vicente](https://github.com/vicentesystemdev) y [Carla](https://github.com/VarlaCdev20), según su historial y ramas de trabajo.
+- **Herramientas de asistencia:** se utilizó Claude Code como apoyo al desarrollo y a la documentación; los estudiantes son responsables de comprobar los resultados y presentar sus contribuciones.
+
+**Este es un proyecto académico no oficial y no comercial.** El hecho de que los repositorios sean públicos o que se reconozca a sus autores no concede por sí mismo una licencia para reutilizar o redistribuir contenido de terceros. No se declara una licencia general para los recursos del juego.
+
+---
+
+<div align="center">
+
+**4 integrantes · 4 mundos · Un proyecto colaborativo**
+
+[↑ Volver al inicio](#-super-mario-bros-2d) · [Repositorio GitHub](https://github.com/vicentesystemdev/SuperMarioVicente)
+
 </div>
