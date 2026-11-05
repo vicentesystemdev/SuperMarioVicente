@@ -134,6 +134,9 @@ public class HudAcuatico : MonoBehaviour
             if (time != lastTime)
             {
                 lastTime = time;
+                timeValue.color = time <= 50
+                    ? new Color(1f, 0.75f, 0.2f)
+                    : Color.white;
                 timeValue.SetText($"{time:000}");
             }
         }
