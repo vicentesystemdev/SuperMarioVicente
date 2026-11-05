@@ -282,6 +282,7 @@ public static class WaterLevelBuilder
         image.raycastTarget = false;
 
         CreateHudText("Mario Label", bar.transform, "MARIO", new Vector2(190f, -42f), 5f);
+        CreateHudText("World Label", bar.transform, "MUNDO 2-2", new Vector2(960f, -42f), 5f);
     }
 
     private static PixelText CreateHudText(string name, Transform parent, string value, Vector2 position, float pixelSize)
