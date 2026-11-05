@@ -42,6 +42,9 @@ public class TemporizadorAcuatico : MonoBehaviour
         if (tiempoRestante <= 0)
             return;
 
+        if (GameManager.Instance != null && GameManager.Instance.resetting)
+            return;
+
         tiempoActual = Mathf.Max(0f, tiempoActual - Time.deltaTime);
         tiempoRestante = Mathf.CeilToInt(tiempoActual);
 
