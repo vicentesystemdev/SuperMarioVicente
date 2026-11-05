@@ -6,7 +6,6 @@ public class BlockCoin : MonoBehaviour
     private void Start()
     {
         GameManager.Instance.AddCoin();
-        GameManager.Instance.AddScore(100);
         Sfx.Play(ChiptuneSynth.Coin);
 
         StartCoroutine(Animate());
