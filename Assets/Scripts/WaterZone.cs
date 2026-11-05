@@ -6,7 +6,7 @@ using UnityEngine;
 public class WaterZone : MonoBehaviour
 {
     public Sprite bubbleSprite;
-    public float bubbleInterval = 1.5f;
+    public float bubbleInterval = 0.9f;
 
     // Logs opcionales para depurar la entrada y salida del agua.
     // Se mantienen apagados durante el juego normal para no llenar la consola.
