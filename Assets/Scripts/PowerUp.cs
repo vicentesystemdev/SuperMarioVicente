@@ -12,29 +12,20 @@ public class PowerUp : MonoBehaviour
 
     public Type type;
 
-    // Destroy happens at the end of the frame, a second trigger in the
-    // same frame must not give the item (and its points) twice
-    private bool collected;
-
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (!collected && other.CompareTag("Player")) {
+        if (other.CompareTag("Player")) {
             Collect(other.gameObject);
         }
     }
 
     private void Collect(GameObject player)
     {
-        collected = true;
-
-        if (type == Type.MagicMushroom || type == Type.Starpower) {
-            GameManager.Instance.AddScore(GameManager.PowerUpPoints);
-        }
-
         switch (type)
         {
             case Type.Coin:
                 GameManager.Instance.AddCoin();
+                GameManager.Instance.AddScore(100);
                 Sfx.Play(ChiptuneSynth.Coin);
                 break;
 

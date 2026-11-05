@@ -2,10 +2,8 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-// Generates 8-bit style jingles, music loops and sound effects at runtime
-// (square, triangle and noise waves). Every melody is an original
-// composition for this project, so no external or copyrighted audio files
-// are required. Any AudioClip assigned in the Inspector takes priority.
+// Uses the Mario Victor recordings for matching cues, with synthesized
+// effects as a fallback. AudioClips assigned in the Inspector take priority.
 public static class ChiptuneSynth
 {
     private const int SampleRate = 44100;
@@ -174,6 +172,14 @@ public static class ChiptuneSynth
 
     public static AudioClip Stomp => Get("Stomp", () => Mix(Sweep(Wave.Square, 0.14f, 74f, 58f, 0.12f)));
 
+    public static AudioClip Damage => Get("Damage", () => Mix(
+        Sequence(
+            Sweep(Wave.Square, 0.16f, 78f, 62f, 0.08f),
+            Sweep(Wave.Square, 0.14f, 70f, 54f, 0.12f)
+        ),
+        Sweep(Wave.Noise, 0.08f, 85f, 55f, 0.18f)
+    ));
+
     public static AudioClip Kick => Get("Kick", () => Mix(Voice(Wave.Square, 0.12f, (76, 0.04f), (83, 0.07f))));
 
     public static AudioClip PipeWarp => Get("Pipe Warp", () => Mix(Sequence(
@@ -193,6 +199,12 @@ public static class ChiptuneSynth
     {
         if (!cache.TryGetValue(name, out AudioClip clip) || clip == null)
         {
+            clip = MarioAudio.LoadCue(name);
+            if (clip != null) {
+                cache[name] = clip;
+                return clip;
+            }
+
             float[] samples = render();
             clip = AudioClip.Create($"{name} (synth)", samples.Length, 1, SampleRate, false);
             clip.SetData(samples, 0);

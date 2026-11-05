@@ -10,6 +10,10 @@ public class SideScrolling : MonoBehaviour
     public float undergroundHeight = -9.5f;
     public float undergroundThreshold = 0f;
 
+    public float smoothTime = 0f;
+    public float lookAhead = 0f;
+    private float smoothVelocityX;
+
     // optional right limit so the camera stops at the end of the level
     public bool limitRight = false;
     public float rightLimit = 0f;
@@ -29,11 +33,15 @@ public class SideScrolling : MonoBehaviour
     {
         // track the player moving to the right
         Vector3 cameraPosition = transform.position;
-        cameraPosition.x = Mathf.Max(cameraPosition.x, player.position.x);
+        float targetX = Mathf.Max(cameraPosition.x, player.position.x + lookAhead);
 
         if (limitRight) {
-            cameraPosition.x = Mathf.Min(cameraPosition.x, rightLimit);
+            targetX = Mathf.Min(targetX, rightLimit);
         }
+
+        cameraPosition.x = smoothTime > 0f
+            ? Mathf.SmoothDamp(cameraPosition.x, targetX, ref smoothVelocityX, smoothTime)
+            : targetX;
 
         transform.position = cameraPosition;
     }

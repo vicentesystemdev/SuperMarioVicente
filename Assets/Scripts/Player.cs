@@ -73,7 +73,7 @@ public class Player : MonoBehaviour
         capsuleCollider.size = new Vector2(1f, 1f);
         capsuleCollider.offset = new Vector2(0f, 0f);
 
-        Sfx.Play(ChiptuneSynth.PipeWarp);
+        Sfx.Play(ChiptuneSynth.Damage);
 
         invulnerableUntil = Time.time + invulnerableDuration;
         StartCoroutine(ScaleAnimation());
