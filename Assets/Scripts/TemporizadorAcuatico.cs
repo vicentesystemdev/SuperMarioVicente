@@ -8,6 +8,8 @@ public class TemporizadorAcuatico : MonoBehaviour
     public int tiempoInicial = 300;
     public int tiempoRestante { get; private set; }
 
+    private float tiempoActual;
+
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     private static void PrepararTemporizador()
     {
@@ -30,7 +32,17 @@ public class TemporizadorAcuatico : MonoBehaviour
         }
 
         Instance = this;
+        tiempoActual = tiempoInicial;
         tiempoRestante = tiempoInicial;
+    }
+
+    private void Update()
+    {
+        if (tiempoRestante <= 0)
+            return;
+
+        tiempoActual = Mathf.Max(0f, tiempoActual - Time.deltaTime);
+        tiempoRestante = Mathf.CeilToInt(tiempoActual);
     }
 
     private void OnDestroy()
