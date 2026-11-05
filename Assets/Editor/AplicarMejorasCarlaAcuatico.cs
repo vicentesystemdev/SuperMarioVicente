@@ -71,6 +71,7 @@ public static class AplicarMejorasCarlaAcuatico
         PrepararAgua(scene);
         PrepararBloquesPoder(scene);
         PrepararFaunaNueva(scene);
+        PrepararCorrientes(scene);
 
         EditorSceneManager.MarkSceneDirty(scene);
         EditorSceneManager.SaveScene(scene);
@@ -164,6 +165,47 @@ public static class AplicarMejorasCarlaAcuatico
                 zone.ambientBubbleInterval = 1.8f;
                 zone.logEvents = false;
             }
+        }
+    }
+
+    private static void PrepararCorrientes(Scene scene)
+    {
+        GameObject oldGroup = FindRoot(scene, "Corrientes Acuaticas");
+        if (oldGroup != null)
+            Object.DestroyImmediate(oldGroup);
+
+        GameObject group = new GameObject("Corrientes Acuaticas");
+        SceneManager.MoveGameObjectToScene(group, scene);
+
+        Sprite bubble = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/Water/Water_Bubble.png");
+
+        CrearCorriente(group.transform, new Vector3(52f, -9f, 0f), new Vector2(10f, 8f), new Vector2(2.6f, 0.7f), bubble, "Corriente a favor");
+        CrearCorriente(group.transform, new Vector3(86f, -9f, 0f), new Vector2(9f, 8f), new Vector2(-2.2f, 0.3f), bubble, "Corriente en contra");
+    }
+
+    private static void CrearCorriente(Transform parent, Vector3 position, Vector2 size, Vector2 force, Sprite bubble, string name)
+    {
+        GameObject zone = new GameObject(name);
+        zone.transform.SetParent(parent, false);
+        zone.transform.position = position;
+
+        BoxCollider2D collider = zone.AddComponent<BoxCollider2D>();
+        collider.isTrigger = true;
+        collider.size = size;
+
+        CorrienteAcuatica current = zone.AddComponent<CorrienteAcuatica>();
+        current.fuerza = force;
+
+        for (int i = 0; i < 5; i++)
+        {
+            GameObject indicator = new GameObject($"Burbuja corriente {i + 1}");
+            indicator.transform.SetParent(zone.transform, false);
+            indicator.transform.localPosition = new Vector3(-size.x * 0.35f + i * size.x * 0.17f, (i % 2 == 0 ? -1f : 1f) * 1.2f, 0f);
+
+            SpriteRenderer renderer = indicator.AddComponent<SpriteRenderer>();
+            renderer.sprite = bubble;
+            renderer.color = new Color(0.7f, 0.95f, 1f, 0.65f);
+            renderer.sortingOrder = 2;
         }
     }
 
