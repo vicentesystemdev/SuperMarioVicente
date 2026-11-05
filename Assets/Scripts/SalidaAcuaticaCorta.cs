@@ -32,7 +32,12 @@ public class SalidaAcuaticaCorta : MonoBehaviour
         if (movement != null)
             movement.SetSwimming(false);
 
-        other.transform.position = new Vector3(454f, 2.5f, 0f);
+        GameObject surfacePipe = GameObject.Find("Surface Pipe");
+        Vector3 destino = surfacePipe != null
+            ? surfacePipe.transform.position + new Vector3(3.5f, -0.5f, 0f)
+            : new Vector3(454f, 2.5f, 0f);
+
+        other.transform.position = destino;
 
         SideScrolling camera = Camera.main != null
             ? Camera.main.GetComponent<SideScrolling>()
