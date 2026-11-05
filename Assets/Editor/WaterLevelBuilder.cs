@@ -280,6 +280,31 @@ public static class WaterLevelBuilder
         Image image = bar.GetComponent<Image>();
         image.color = new Color(0.015f, 0.04f, 0.12f, 0.72f);
         image.raycastTarget = false;
+
+        CreateHudText("Mario Label", bar.transform, "MARIO", new Vector2(190f, -42f), 5f);
+    }
+
+    private static PixelText CreateHudText(string name, Transform parent, string value, Vector2 position, float pixelSize)
+    {
+        GameObject textObject = new GameObject(name, typeof(RectTransform), typeof(RawImage), typeof(PixelText));
+        textObject.transform.SetParent(parent, false);
+
+        RectTransform rect = textObject.GetComponent<RectTransform>();
+        rect.anchorMin = new Vector2(0f, 1f);
+        rect.anchorMax = new Vector2(0f, 1f);
+        rect.pivot = new Vector2(0.5f, 0.5f);
+        rect.anchoredPosition = position;
+
+        RawImage image = textObject.GetComponent<RawImage>();
+        image.raycastTarget = false;
+
+        PixelText text = textObject.GetComponent<PixelText>();
+        text.text = value;
+        text.pixelSize = pixelSize;
+        text.color = Color.white;
+        text.Refresh();
+
+        return text;
     }
 
     private static void BuildCamera()
