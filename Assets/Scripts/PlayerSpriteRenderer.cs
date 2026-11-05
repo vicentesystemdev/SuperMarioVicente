@@ -21,7 +21,7 @@ public class PlayerSpriteRenderer : MonoBehaviour
 
     private void LateUpdate()
     {
-        if (movement.swimming && !movement.grounded)
+        if (movement.swimming)
         {
             run.enabled = false;
 
