@@ -92,6 +92,10 @@ public abstract class WaterEnemy : MonoBehaviour
     public void Hit()
     {
         dead = true;
+
+        if (GameManager.Instance != null)
+            GameManager.Instance.AddScore(puntos);
+
         Sfx.Play(ChiptuneSynth.Kick);
 
         AnimatedSprite animatedSprite = GetComponent<AnimatedSprite>();
