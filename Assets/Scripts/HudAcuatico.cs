@@ -6,8 +6,10 @@ public class HudAcuatico : MonoBehaviour
 {
     private PixelText coinsValue;
     private PixelText scoreValue;
+    private PixelText timeValue;
     private int lastCoins = -1;
     private int lastScore = -1;
+    private int lastTime = -1;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     private static void PrepararHud()
@@ -92,12 +94,16 @@ public class HudAcuatico : MonoBehaviour
     {
         Transform value = transform.Find("Barra Superior/Coins Value");
         Transform score = transform.Find("Barra Superior/Score Label");
+        Transform time = transform.Find("Barra Superior/Time Value");
 
         if (value != null)
             coinsValue = value.GetComponent<PixelText>();
 
         if (score != null)
             scoreValue = score.GetComponent<PixelText>();
+
+        if (time != null)
+            timeValue = time.GetComponent<PixelText>();
     }
 
     private void Update()
@@ -119,6 +125,17 @@ public class HudAcuatico : MonoBehaviour
         {
             lastScore = score;
             scoreValue.SetText($"{score:000000}");
+        }
+
+        if (timeValue != null && TemporizadorAcuatico.Instance != null)
+        {
+            int time = TemporizadorAcuatico.Instance.tiempoRestante;
+
+            if (time != lastTime)
+            {
+                lastTime = time;
+                timeValue.SetText($"{time:000}");
+            }
         }
     }
 }
