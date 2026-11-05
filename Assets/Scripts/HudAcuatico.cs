@@ -49,6 +49,7 @@ public class HudAcuatico : MonoBehaviour
         image.raycastTarget = false;
 
         CreateText("Mario Label", bar.transform, "MARIO", new Vector2(190f, -42f));
+        CreateText("Score Label", bar.transform, "000000", new Vector2(190f, -92f));
         CreateText("World Label", bar.transform, "MUNDO 2-2", new Vector2(960f, -42f));
         CreateText("Coins Label", bar.transform, "MONEDAS", new Vector2(570f, -42f));
         CreateText("Coins Value", bar.transform, "X00", new Vector2(570f, -92f));
