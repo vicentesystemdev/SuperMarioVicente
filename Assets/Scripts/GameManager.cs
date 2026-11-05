@@ -39,9 +39,14 @@ public class GameManager : MonoBehaviour
     public AudioClip deathSound;
     public float fadeDuration = 0.5f;
 
+    // seconds the lives screen is shown after a death (0 disables it)
+    public float livesScreenDuration = 2.5f;
+
     private AudioSource audioSource;
     private ScreenFader fader;
     private GameHud hud;
+    private LivesScreen livesScreen;
+    private Sprite marioSprite;
     private Coroutine resetRoutine;
     private float secondsPerTick = DefaultSecondsPerTick;
     private float tickTimer;
@@ -72,6 +77,7 @@ public class GameManager : MonoBehaviour
             audioSource.playOnAwake = false;
             fader = ScreenFader.Create(transform);
             hud = GameHud.Create(transform);
+            livesScreen = LivesScreen.Create(transform);
         }
     }
 
@@ -120,6 +126,8 @@ public class GameManager : MonoBehaviour
             resetRoutine = null;
         }
 
+        livesScreen.Hide();
+        Time.timeScale = 1f;
         resetting = false;
         hasCheckpoint = false;
         lives = StartingLives;
@@ -216,6 +224,27 @@ public class GameManager : MonoBehaviour
         yield return new WaitForSeconds(Mathf.Max(0f, delay - fadeDuration));
         yield return fader.FadeTo(1f, fadeDuration);
 
+        // ResetLevel() takes the life, so the screen shows the lives that
+        // will remain; with no lives left GameOver is loaded directly.
+        // resetting stays true until the level reloads, so the clock is
+        // stopped and further deaths are ignored while it is shown
+        int remaining = lives - 1;
+
+        if (remaining > 0 && livesScreenDuration > 0f)
+        {
+            // the old level is frozen behind the screen (no enemy sounds)
+            Time.timeScale = 0f;
+            hud.SetVisible(false);
+            livesScreen.Show(world, stage, remaining, marioSprite);
+
+            yield return fader.FadeTo(0f, fadeDuration);
+            yield return new WaitForSecondsRealtime(Mathf.Max(0f, livesScreenDuration - fadeDuration));
+            yield return fader.FadeTo(1f, fadeDuration);
+
+            livesScreen.Hide();
+            Time.timeScale = 1f;
+        }
+
         resetRoutine = null;
         ResetLevel();
     }
@@ -267,8 +296,15 @@ public class GameManager : MonoBehaviour
 
         Player player = FindAnyObjectByType<Player>();
 
-        if (player != null) {
+        if (player != null)
+        {
             playerMovement = player.GetComponent<PlayerMovement>();
+
+            // kept for the lives screen, Mario may be inactive (pit) or
+            // showing his death sprite by the time it is needed
+            if (player.smallRenderer != null) {
+                marioSprite = player.smallRenderer.idle;
+            }
         }
 
         // Preserve the aquatic HUD and its 180-second clock as the sole
