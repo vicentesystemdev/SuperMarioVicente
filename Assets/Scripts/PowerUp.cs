@@ -25,6 +25,7 @@ public class PowerUp : MonoBehaviour
         {
             case Type.Coin:
                 GameManager.Instance.AddCoin();
+                GameManager.Instance.AddScore(100);
                 Sfx.Play(ChiptuneSynth.Coin);
                 break;
 
