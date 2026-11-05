@@ -693,6 +693,7 @@ public static class WaterLevelBuilder
         Fish component = fish.GetComponent<Fish>();
         component.speed = speed;
         component.waveAmplitude = amplitude;
+        component.puntos = 200;
         Record(component);
 
         // faster fish are tinted red so the player can read the danger
