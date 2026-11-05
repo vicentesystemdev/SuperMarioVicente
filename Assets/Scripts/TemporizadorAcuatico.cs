@@ -5,7 +5,7 @@ public class TemporizadorAcuatico : MonoBehaviour
 {
     public static TemporizadorAcuatico Instance { get; private set; }
 
-    public int tiempoInicial = 300;
+    public int tiempoInicial = 180;
     public int tiempoRestante { get; private set; }
 
     private float tiempoActual;
