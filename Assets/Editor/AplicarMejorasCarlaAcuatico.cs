@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 public static class AplicarMejorasCarlaAcuatico
 {
     private const string ScenePath = "Assets/Scenes/2-2.unity";
-    private const string MarkerName = "MEJORAS_CARLA_ACUATICO_V3";
+    private const string MarkerName = "MEJORAS_CARLA_ACUATICO_V4";
 
     static AplicarMejorasCarlaAcuatico()
     {
@@ -60,6 +60,10 @@ public static class AplicarMejorasCarlaAcuatico
         GameObject oldMarkerV2 = FindRoot(scene, "MEJORAS_CARLA_ACUATICO_V2");
         if (oldMarkerV2 != null)
             Object.DestroyImmediate(oldMarkerV2);
+
+        GameObject oldMarkerV3 = FindRoot(scene, "MEJORAS_CARLA_ACUATICO_V3");
+        if (oldMarkerV3 != null)
+            Object.DestroyImmediate(oldMarkerV3);
 
         GameObject marker = new GameObject(MarkerName);
         SceneManager.MoveGameObjectToScene(marker, scene);
