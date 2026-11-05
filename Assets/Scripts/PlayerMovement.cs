@@ -41,6 +41,16 @@ public class PlayerMovement : MonoBehaviour
         carry = platformVelocity;
     }
 
+    public void ApplyWaterCurrent(Vector2 acceleration)
+    {
+        if (!swimming)
+            return;
+
+        velocity += acceleration * Time.deltaTime;
+        velocity.x = Mathf.Clamp(velocity.x, -swimSpeed * 1.5f, swimSpeed * 1.5f);
+        velocity.y = Mathf.Clamp(velocity.y, maxSinkSpeed, swimStroke * 1.2f);
+    }
+
     private void Awake()
     {
         camera = Camera.main;
