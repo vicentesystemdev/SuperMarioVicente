@@ -313,6 +313,10 @@ public class Boss : MonoBehaviour
         dead = true;
         StopAllCoroutines();
 
+        if (GameManager.Instance != null) {
+            GameManager.Instance.AddScore(GameManager.BossPoints);
+        }
+
         if (healthBar != null) {
             healthBar.Hide();
         }

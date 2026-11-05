@@ -2,10 +2,8 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-// Generates 8-bit style jingles, music loops and sound effects at runtime
-// (square, triangle and noise waves). Every melody is an original
-// composition for this project, so no external or copyrighted audio files
-// are required. Any AudioClip assigned in the Inspector takes priority.
+// Uses the Mario Victor recordings for matching cues, with synthesized
+// effects as a fallback. AudioClips assigned in the Inspector take priority.
 public static class ChiptuneSynth
 {
     private const int SampleRate = 44100;
@@ -103,7 +101,26 @@ public static class ChiptuneSynth
         Voice(Wave.Square, 0.12f, (72, 0.12f), (76, 0.12f), (79, 0.12f), (84, 0.5f)),
         Voice(Wave.Triangle, 0.3f, (48, 0.36f), (55, 0.5f))));
 
+    // 3 second level clear fanfare played when the flag reaches the bottom:
+    // rising arpeggios over I - ii - V - I with a held final chord
+    public static AudioClip LevelClear => Get("Level Clear", () => Mix(
+        Voice(Wave.Square, 0.11f,
+            (67, 0.1f), (72, 0.1f), (76, 0.1f), (79, 0.2f), (76, 0.1f), (79, 0.3f),
+            (69, 0.1f), (74, 0.1f), (77, 0.1f), (81, 0.2f), (77, 0.1f), (81, 0.3f),
+            (71, 0.1f), (74, 0.1f), (79, 0.1f), (83, 0.1f), (86, 0.1f),
+            (84, 0.7f)),
+        Voice(Wave.Square, 0.05f,
+            (Rest, 0.3f), (72, 0.6f),
+            (Rest, 0.3f), (74, 0.6f),
+            (Rest, 0.5f), (76, 0.7f)),
+        Voice(Wave.Triangle, 0.3f,
+            (48, 0.3f), (55, 0.3f), (48, 0.3f),
+            (50, 0.3f), (57, 0.3f), (50, 0.3f),
+            (43, 0.5f), (48, 0.7f))));
+
     // sound effects
+
+    public static AudioClip FlagTouch => Get("Flag Touch", () => Mix(Voice(Wave.Square, 0.12f, (79, 0.04f), (91, 0.08f))));
 
     public static AudioClip Fire => Get("Fire", () => Mix(Sweep(Wave.Noise, 0.18f, 90f, 60f, 0.25f)));
 
@@ -182,6 +199,12 @@ public static class ChiptuneSynth
     {
         if (!cache.TryGetValue(name, out AudioClip clip) || clip == null)
         {
+            clip = MarioAudio.LoadCue(name);
+            if (clip != null) {
+                cache[name] = clip;
+                return clip;
+            }
+
             float[] samples = render();
             clip = AudioClip.Create($"{name} (synth)", samples.Length, 1, SampleRate, false);
             clip.SetData(samples, 0);

@@ -5,7 +5,7 @@ using UnityEngine;
 [RequireComponent(typeof(AudioSource))]
 public class LevelMusic : MonoBehaviour
 {
-    public enum Theme { Underground, Water, Castle, Boss, Victory }
+    public enum Theme { Underground, Water, Castle, Boss, Victory, Overworld }
 
     // optional, the synthesized theme is used when left empty
     public AudioClip music;
@@ -65,6 +65,7 @@ public class LevelMusic : MonoBehaviour
             case Theme.Castle: return ChiptuneSynth.CastleTheme;
             case Theme.Boss: return ChiptuneSynth.BossTheme;
             case Theme.Victory: return ChiptuneSynth.VictoryTheme;
+            case Theme.Overworld: return MarioAudio.Load("super-mario-bros");
             default: return ChiptuneSynth.UndergroundTheme;
         }
     }

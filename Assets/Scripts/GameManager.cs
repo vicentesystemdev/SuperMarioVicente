@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour
 {
     public const int StartingLives = 3;
+    public const string MainMenuScene = "MainMenu";
     public const string GameOverScene = "GameOver";
     public const string VictoryScene = "Victory";
 
@@ -14,16 +15,43 @@ public class GameManager : MonoBehaviour
     public int stage { get; private set; }
     public int lives { get; private set; }
     public int coins { get; private set; }
-    public int score { get; private set; }
     public bool resetting { get; private set; }
+
+    // points (NES values)
+    public const int CoinPoints = 200;
+    public const int StompPoints = 100;
+    public const int EnemyKillPoints = 200;
+    public const int PowerUpPoints = 1000;
+    public const int BossPoints = 5000;
+    public const int TimeBonusPoints = 50;
+
+    // level timer, a LevelSettings component in the scene overrides these
+    public const int DefaultTimeLimit = 400;
+    public const float DefaultSecondsPerTick = 0.5f;
+    public const int HurryUpTime = 100;
+
+    public int score { get; private set; }
+    public int time { get; private set; }
+    public bool timerRunning { get; private set; }
+    public bool hurryUp => timerRunning && time <= HurryUpTime;
 
     // optional, a synthesized jingle is used when left empty
     public AudioClip deathSound;
     public float fadeDuration = 0.5f;
 
+    // seconds the lives screen is shown after a death (0 disables it)
+    public float livesScreenDuration = 2.5f;
+
     private AudioSource audioSource;
     private ScreenFader fader;
+    private GameHud hud;
+    private LivesScreen livesScreen;
+    private Sprite marioSprite;
     private Coroutine resetRoutine;
+    private float secondsPerTick = DefaultSecondsPerTick;
+    private float tickTimer;
+    private PlayerMovement playerMovement;
+    private TemporizadorAcuatico aquaticTimer;
 
     // checkpoint of the current level, kept while the level is reloaded
     // after a death and cleared when another level or a new game starts
@@ -48,6 +76,8 @@ public class GameManager : MonoBehaviour
 
             audioSource.playOnAwake = false;
             fader = ScreenFader.Create(transform);
+            hud = GameHud.Create(transform);
+            livesScreen = LivesScreen.Create(transform);
         }
     }
 
@@ -70,6 +100,11 @@ public class GameManager : MonoBehaviour
             ResetGameState();
             this.world = world;
             this.stage = stage;
+            StartLevel(SceneManager.GetActiveScene());
+        }
+        else if (SceneManager.GetActiveScene().name == MainMenuScene)
+        {
+            ResetGameState();
         }
         else
         {
@@ -91,6 +126,8 @@ public class GameManager : MonoBehaviour
             resetRoutine = null;
         }
 
+        livesScreen.Hide();
+        Time.timeScale = 1f;
         resetting = false;
         hasCheckpoint = false;
         lives = StartingLives;
@@ -148,7 +185,10 @@ public class GameManager : MonoBehaviour
 
     public void Victory()
     {
-        Debug.Log($"[GameManager] ¡Victoria! Monedas: {coins}, vidas: {lives}");
+        // the castle goal has no flag pole, the time bonus is added here
+        LevelComplete();
+
+        Debug.Log($"[GameManager] ¡Victoria! Puntos: {score}, monedas: {coins}, vidas: {lives}");
         hasCheckpoint = false;
 
         if (Application.CanStreamedLevelBeLoaded(VictoryScene)) {
@@ -173,6 +213,7 @@ public class GameManager : MonoBehaviour
         }
 
         resetting = true;
+        timerRunning = false;
 
         audioSource.PlayOneShot(deathSound != null ? deathSound : ChiptuneSynth.DeathJingle);
         resetRoutine = StartCoroutine(ResetLevelRoutine(delay));
@@ -182,6 +223,27 @@ public class GameManager : MonoBehaviour
     {
         yield return new WaitForSeconds(Mathf.Max(0f, delay - fadeDuration));
         yield return fader.FadeTo(1f, fadeDuration);
+
+        // ResetLevel() takes the life, so the screen shows the lives that
+        // will remain; with no lives left GameOver is loaded directly.
+        // resetting stays true until the level reloads, so the clock is
+        // stopped and further deaths are ignored while it is shown
+        int remaining = lives - 1;
+
+        if (remaining > 0 && livesScreenDuration > 0f)
+        {
+            // the old level is frozen behind the screen (no enemy sounds)
+            Time.timeScale = 0f;
+            hud.SetVisible(false);
+            livesScreen.Show(world, stage, remaining, marioSprite);
+
+            yield return fader.FadeTo(0f, fadeDuration);
+            yield return new WaitForSecondsRealtime(Mathf.Max(0f, livesScreenDuration - fadeDuration));
+            yield return fader.FadeTo(1f, fadeDuration);
+
+            livesScreen.Hide();
+            Time.timeScale = 1f;
+        }
 
         resetRoutine = null;
         ResetLevel();
@@ -207,6 +269,126 @@ public class GameManager : MonoBehaviour
         if (fader.alpha > 0f) {
             StartCoroutine(fader.FadeTo(0f, fadeDuration));
         }
+
+        StartLevel(scene);
+    }
+
+    // restarts the timer and shows the HUD in level scenes, the GameOver
+    // and Victory scenes have their own stats so the HUD is hidden there
+    private void StartLevel(Scene scene)
+    {
+        bool isLevel = TryParseLevel(scene.name, out _, out _);
+        hud.SetVisible(isLevel && scene.name != "2-2");
+
+        timerRunning = false;
+        playerMovement = null;
+        aquaticTimer = null;
+
+        if (!isLevel) {
+            return;
+        }
+
+        LevelSettings settings = FindAnyObjectByType<LevelSettings>();
+        time = settings != null ? settings.timeLimit : DefaultTimeLimit;
+        secondsPerTick = settings != null ? settings.secondsPerTick : DefaultSecondsPerTick;
+        tickTimer = 0f;
+        timerRunning = true;
+
+        Player player = FindAnyObjectByType<Player>();
+
+        if (player != null)
+        {
+            playerMovement = player.GetComponent<PlayerMovement>();
+
+            // kept for the lives screen, Mario may be inactive (pit) or
+            // showing his death sprite by the time it is needed
+            if (player.smallRenderer != null) {
+                marioSprite = player.smallRenderer.idle;
+            }
+        }
+
+        // Preserve the aquatic HUD and its 180-second clock as the sole
+        // owners of the 2-2 display and countdown, including scene transitions.
+        if (scene.name == "2-2")
+        {
+            aquaticTimer = FindAnyObjectByType<TemporizadorAcuatico>();
+            if (aquaticTimer == null) {
+                aquaticTimer = new GameObject("Temporizador Acuatico").AddComponent<TemporizadorAcuatico>();
+            }
+            if (FindAnyObjectByType<HudAcuatico>() == null) {
+                HudAcuatico.PrepararHud();
+            }
+            time = aquaticTimer.tiempoRestante;
+        }
+    }
+
+    private void Update()
+    {
+        if (!timerRunning || resetting) {
+            return;
+        }
+
+        if (aquaticTimer != null)
+        {
+            aquaticTimer.enabled = playerMovement != null && playerMovement.enabled;
+            time = aquaticTimer.tiempoRestante;
+            return;
+        }
+
+        // the clock stops while Mario has no control (pipes, flag pole,
+        // castle goal), so the level ending can never run out of time
+        if (playerMovement == null || !playerMovement.enabled) {
+            return;
+        }
+
+        tickTimer += Time.deltaTime;
+
+        while (tickTimer >= secondsPerTick && time > 0)
+        {
+            tickTimer -= secondsPerTick;
+            time--;
+        }
+
+        if (time <= 0) {
+            TimeUp();
+        }
+    }
+
+    private void TimeUp()
+    {
+        timerRunning = false;
+        Debug.Log("[GameManager] Tiempo agotado");
+
+        Player player = playerMovement != null ? playerMovement.GetComponent<Player>() : null;
+
+        // the normal death sequence costs the life and plays the jingle
+        if (player != null && player.gameObject.activeInHierarchy) {
+            player.Death();
+        } else {
+            ResetLevel(3f);
+        }
+    }
+
+    // stops the clock and converts the remaining time into points, only
+    // the first call of a level counts
+    public void LevelComplete()
+    {
+        if (!timerRunning) {
+            return;
+        }
+
+        timerRunning = false;
+        if (aquaticTimer != null) {
+            time = aquaticTimer.tiempoRestante;
+            aquaticTimer.enabled = false;
+        }
+        AddScore(time * TimeBonusPoints);
+        Debug.Log($"[GameManager] Nivel completado: bonus de tiempo {time} x {TimeBonusPoints}");
+    }
+
+    public void AddScore(int points)
+    {
+        score = Mathf.Max(0, score + points);
     }
 
     private static bool TryParseLevel(string sceneName, out int world, out int stage)
@@ -227,11 +409,6 @@ public class GameManager : MonoBehaviour
             coins = 0;
             AddLife();
         }
-    }
-
-    public void AddScore(int points)
-    {
-        score = Mathf.Max(0, score + points);
     }
 
     public void AddLife()
