@@ -8,8 +8,9 @@ public class WaterZone : MonoBehaviour
     public Sprite bubbleSprite;
     public float bubbleInterval = 1.5f;
 
-    // TEMPORARY diagnostics: logs when Mario starts / stops swimming
-    public bool logEvents = true;
+    // Logs opcionales para depurar la entrada y salida del agua.
+    // Se mantienen apagados durante el juego normal para no llenar la consola.
+    public bool logEvents = false;
 
     private BoxCollider2D area;
     private PlayerMovement swimmer;
