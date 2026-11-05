@@ -21,9 +21,13 @@ public class Bubble : MonoBehaviour
         spriteRenderer.sprite = sprite;
         spriteRenderer.sortingOrder = 4;
 
+        float scale = Random.Range(0.7f, 1.15f);
+        bubble.transform.localScale = new Vector3(scale, scale, 1f);
+
         Bubble component = bubble.AddComponent<Bubble>();
         component.surface = surface;
         component.seed = Random.value * 10f;
+        component.speed = Random.Range(1.6f, 2.4f);
 
         Destroy(bubble, 5f);
     }
