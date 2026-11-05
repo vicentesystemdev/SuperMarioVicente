@@ -29,7 +29,7 @@ public class GameOverScreen : MonoBehaviour
     private void Start()
     {
         if (GameManager.Instance != null && worldLabel != null) {
-            worldLabel.SetText($"MUNDO {GameManager.Instance.world}-{GameManager.Instance.stage}");
+            worldLabel.SetText($"MUNDO {GameManager.Instance.world}-{GameManager.Instance.stage}  PUNTOS {GameManager.Instance.score:D6}");
         }
 
         buttons.alpha = 0f;

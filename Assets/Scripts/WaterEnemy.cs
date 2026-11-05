@@ -9,6 +9,8 @@ public abstract class WaterEnemy : MonoBehaviour
     protected SpriteRenderer spriteRenderer;
     protected Transform player;
 
+    public int scoreValue = GameManager.EnemyKillPoints;
+
     private bool active;
     private bool dead;
 
@@ -89,7 +91,12 @@ public abstract class WaterEnemy : MonoBehaviour
 
     public void Hit()
     {
+        if (dead) {
+            return;
+        }
+
         dead = true;
+        GameManager.Instance.AddScore(scoreValue);
         Sfx.Play(ChiptuneSynth.Kick);
 
         AnimatedSprite animatedSprite = GetComponent<AnimatedSprite>();

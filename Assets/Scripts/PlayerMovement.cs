@@ -41,6 +41,16 @@ public class PlayerMovement : MonoBehaviour
         carry = platformVelocity;
     }
 
+    public void ApplyWaterCurrent(Vector2 acceleration)
+    {
+        if (!swimming)
+            return;
+
+        velocity += acceleration * Time.deltaTime;
+        velocity.x = Mathf.Clamp(velocity.x, -swimSpeed * 1.5f, swimSpeed * 1.5f);
+        velocity.y = Mathf.Clamp(velocity.y, maxSinkSpeed, swimStroke * 1.2f);
+    }
+
     private void Awake()
     {
         camera = Camera.main;
@@ -180,6 +190,17 @@ public class PlayerMovement : MonoBehaviour
         if (Input.GetButtonDown("Jump"))
         {
             velocity.y = swimStroke;
+
+            float strokeDirection = Mathf.Abs(inputAxis) > 0.1f
+                ? Mathf.Sign(inputAxis)
+                : Mathf.Sign(velocity.x == 0f ? 1f : velocity.x);
+
+            velocity.x = Mathf.Clamp(
+                velocity.x + strokeDirection * 1.2f,
+                -swimSpeed * 1.2f,
+                swimSpeed * 1.2f
+            );
+
             lastStrokeTime = Time.time;
             Sfx.Play(ChiptuneSynth.Swim);
         }

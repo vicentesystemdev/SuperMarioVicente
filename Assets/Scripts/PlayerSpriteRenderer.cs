@@ -10,29 +10,48 @@ public class PlayerSpriteRenderer : MonoBehaviour
     public Sprite slide;
     public AnimatedSprite run;
 
+    private Vector3 restingLocalPosition;
+
     private void Awake()
     {
         movement = GetComponentInParent<PlayerMovement>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+        restingLocalPosition = transform.localPosition;
     }
 
     private void LateUpdate()
     {
-        if (movement.swimming && !movement.grounded)
+        if (movement.swimming)
         {
-            // swim cycle reusing the existing frames: stroke pose after a
-            // stroke, slow leg kicks with the run frames while gliding
             run.enabled = false;
 
-            if (movement.stroking || run.sprites.Length == 0) {
+            float phase = Time.time * 9f;
+            float swimTilt = movement.stroking
+                ? -28f
+                : Mathf.Sin(phase) * 12f;
+
+            float bob = movement.stroking
+                ? 0.14f
+                : Mathf.Sin(phase * 0.7f) * 0.08f;
+
+            transform.localRotation = Quaternion.Euler(0f, 0f, swimTilt);
+            transform.localPosition = restingLocalPosition + Vector3.up * bob;
+
+            if (movement.stroking || run.sprites.Length == 0)
+            {
                 spriteRenderer.sprite = jump;
-            } else {
-                spriteRenderer.sprite = run.sprites[Mathf.FloorToInt(Time.time * 5f) % run.sprites.Length];
+            }
+            else
+            {
+                int frame = Mathf.FloorToInt(Time.time * 8f) % run.sprites.Length;
+                spriteRenderer.sprite = run.sprites[frame];
             }
 
             return;
         }
 
+        transform.localRotation = Quaternion.identity;
+        transform.localPosition = restingLocalPosition;
         run.enabled = movement.running;
 
         if (movement.jumping) {
@@ -51,6 +70,8 @@ public class PlayerSpriteRenderer : MonoBehaviour
 
     private void OnDisable()
     {
+        transform.localRotation = Quaternion.identity;
+        transform.localPosition = restingLocalPosition;
         spriteRenderer.enabled = false;
         run.enabled = false;
     }

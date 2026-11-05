@@ -37,7 +37,7 @@ public class VictoryScreen : MonoBehaviour
     private void Start()
     {
         if (GameManager.Instance != null && statsLabel != null) {
-            statsLabel.SetText($"MONEDAS {GameManager.Instance.coins}  VIDAS {GameManager.Instance.lives}");
+            statsLabel.SetText($"PUNTOS {GameManager.Instance.score:D6}  MONEDAS {GameManager.Instance.coins}  VIDAS {GameManager.Instance.lives}");
         }
 
         marioOrigin = mario.anchoredPosition;
