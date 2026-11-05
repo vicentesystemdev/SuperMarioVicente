@@ -51,7 +51,6 @@ public class GameManager : MonoBehaviour
     private float secondsPerTick = DefaultSecondsPerTick;
     private float tickTimer;
     private PlayerMovement playerMovement;
-    private TemporizadorAcuatico aquaticTimer;
 
     // checkpoint of the current level, kept while the level is reloaded
     // after a death and cleared when another level or a new game starts
@@ -282,7 +281,6 @@ public class GameManager : MonoBehaviour
 
         timerRunning = false;
         playerMovement = null;
-        aquaticTimer = null;
 
         if (!isLevel) {
             return;
@@ -307,28 +305,11 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        // El 2-2 conserva su reloj acuatico, pero usa el HUD general del equipo
-        // para monedas, puntuacion, mundo y tiempo.
-        if (scene.name == "2-2")
-        {
-            aquaticTimer = FindAnyObjectByType<TemporizadorAcuatico>();
-            if (aquaticTimer == null) {
-                aquaticTimer = new GameObject("Temporizador Acuatico").AddComponent<TemporizadorAcuatico>();
-            }
-            time = aquaticTimer.tiempoRestante;
-        }
     }
 
     private void Update()
     {
         if (!timerRunning || resetting) {
-            return;
-        }
-
-        if (aquaticTimer != null)
-        {
-            aquaticTimer.enabled = playerMovement != null && playerMovement.enabled;
-            time = aquaticTimer.tiempoRestante;
             return;
         }
 
@@ -375,17 +356,15 @@ public class GameManager : MonoBehaviour
         }
 
         timerRunning = false;
-        if (aquaticTimer != null) {
-            time = aquaticTimer.tiempoRestante;
-            aquaticTimer.enabled = false;
-        }
         AddScore(time * TimeBonusPoints);
         Debug.Log($"[GameManager] Nivel completado: bonus de tiempo {time} x {TimeBonusPoints}");
     }
 
     public void AddScore(int points)
     {
-        score = Mathf.Max(0, score + points);
+        if (points > 0) {
+            score = Mathf.Min(score + points, 999999);
+        }
     }
 
     private static bool TryParseLevel(string sceneName, out int world, out int stage)
@@ -400,6 +379,7 @@ public class GameManager : MonoBehaviour
     public void AddCoin()
     {
         coins++;
+        AddScore(CoinPoints);
 
         if (coins == 100)
         {
