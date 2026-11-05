@@ -16,6 +16,7 @@ public static class AplicarMejorasCarlaAcuatico
     }
 
     [MenuItem("Tools/Super Mario/Aplicar mejoras Carla al nivel 2-2")]
+    [MenuItem("Tools/Carla/Aplicar mejoras nivel acuatico 2-2")]
     public static void AplicarManual()
     {
         Aplicar(true);
