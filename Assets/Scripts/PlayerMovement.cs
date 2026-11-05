@@ -180,6 +180,17 @@ public class PlayerMovement : MonoBehaviour
         if (Input.GetButtonDown("Jump"))
         {
             velocity.y = swimStroke;
+
+            float strokeDirection = Mathf.Abs(inputAxis) > 0.1f
+                ? Mathf.Sign(inputAxis)
+                : Mathf.Sign(velocity.x == 0f ? 1f : velocity.x);
+
+            velocity.x = Mathf.Clamp(
+                velocity.x + strokeDirection * 1.2f,
+                -swimSpeed * 1.2f,
+                swimSpeed * 1.2f
+            );
+
             lastStrokeTime = Time.time;
             Sfx.Play(ChiptuneSynth.Swim);
         }
