@@ -158,13 +158,17 @@ public static class AplicarMejorasCarlaAcuatico
         {
             salida = new GameObject("Salida Acuatica Corta");
             SceneManager.MoveGameObjectToScene(salida, scene);
-            salida.transform.position = new Vector3(166f, -9f, 0f);
+            salida.AddComponent<BoxCollider2D>();
+            salida.AddComponent<SalidaAcuaticaCorta>();
+        }
 
-            BoxCollider2D collider = salida.AddComponent<BoxCollider2D>();
+        salida.transform.position = new Vector3(166f, -9f, 0f);
+
+        BoxCollider2D collider = salida.GetComponent<BoxCollider2D>();
+        if (collider != null)
+        {
             collider.isTrigger = true;
             collider.size = new Vector2(3f, 14f);
-
-            salida.AddComponent<SalidaAcuaticaCorta>();
         }
     }
 
