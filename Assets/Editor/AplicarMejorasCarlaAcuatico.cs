@@ -70,6 +70,7 @@ public static class AplicarMejorasCarlaAcuatico
         PrepararCamara(scene);
         PrepararAgua(scene);
         PrepararBloquesPoder(scene);
+        PrepararFaunaNueva(scene);
 
         EditorSceneManager.MarkSceneDirty(scene);
         EditorSceneManager.SaveScene(scene);
@@ -164,6 +165,76 @@ public static class AplicarMejorasCarlaAcuatico
                 zone.logEvents = false;
             }
         }
+    }
+
+    private static void PrepararFaunaNueva(Scene scene)
+    {
+        GameObject oldGroup = FindRoot(scene, "Fauna Nueva Carla");
+        if (oldGroup != null)
+            Object.DestroyImmediate(oldGroup);
+
+        GameObject group = new GameObject("Fauna Nueva Carla");
+        SceneManager.MoveGameObjectToScene(group, scene);
+
+        Sprite fish1 = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/Water/Fish_Swim1.png");
+        Sprite fish2 = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/Water/Fish_Swim2.png");
+
+        CrearPezGlobo(group.transform, new Vector3(42f, -8f, 0f), fish1, fish2);
+        CrearPezGlobo(group.transform, new Vector3(88f, -6f, 0f), fish1, fish2);
+
+        CrearAnguila(group.transform, new Vector3(70f, -11f, 0f), fish1);
+        CrearAnguila(group.transform, new Vector3(102f, -8f, 0f), fish1);
+    }
+
+    private static void CrearPezGlobo(Transform parent, Vector3 position, Sprite frame1, Sprite frame2)
+    {
+        GameObject animal = CrearEnemigoBase(parent, "Pez Globo", position, frame1, new Color(1f, 0.82f, 0.25f));
+        animal.transform.localScale = Vector3.one * 1.25f;
+
+        AnimatedSprite animation = animal.AddComponent<AnimatedSprite>();
+        animation.sprites = new[] { frame1, frame2 };
+        animation.framerate = 0.24f;
+
+        PufferFish puffer = animal.AddComponent<PufferFish>();
+        puffer.speed = 1.1f;
+        puffer.waveAmplitude = 0.8f;
+    }
+
+    private static void CrearAnguila(Transform parent, Vector3 position, Sprite sprite)
+    {
+        GameObject animal = CrearEnemigoBase(parent, "Anguila", position, sprite, new Color(0.35f, 1f, 0.55f));
+        animal.transform.localScale = new Vector3(1.8f, 0.75f, 1f);
+
+        Eel eel = animal.AddComponent<Eel>();
+        eel.patrolSpeed = 1.2f;
+        eel.dashSpeed = 5.8f;
+    }
+
+    private static GameObject CrearEnemigoBase(Transform parent, string name, Vector3 position, Sprite sprite, Color tint)
+    {
+        GameObject animal = new GameObject(name);
+        animal.transform.SetParent(parent, false);
+        animal.transform.position = position;
+        animal.layer = LayerMask.NameToLayer("Enemy");
+
+        SpriteRenderer renderer = animal.AddComponent<SpriteRenderer>();
+        renderer.sprite = sprite;
+        renderer.color = tint;
+        renderer.sortingOrder = 4;
+
+        Rigidbody2D body = animal.AddComponent<Rigidbody2D>();
+        body.bodyType = RigidbodyType2D.Kinematic;
+        body.gravityScale = 0f;
+
+        CircleCollider2D collider = animal.AddComponent<CircleCollider2D>();
+        collider.isTrigger = true;
+        collider.radius = 0.48f;
+
+        DeathAnimation death = animal.AddComponent<DeathAnimation>();
+        death.spriteRenderer = renderer;
+        death.enabled = false;
+
+        return animal;
     }
 
     private static void PrepararBloquesPoder(Scene scene)
