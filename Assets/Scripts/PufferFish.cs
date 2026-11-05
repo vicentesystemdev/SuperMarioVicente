@@ -12,7 +12,7 @@ public class PufferFish : WaterEnemy
     protected override void Awake()
     {
         base.Awake();
-        puntos = 400;
+        scoreValue = 400;
     }
 
     protected override void OnActivate()
