@@ -278,7 +278,7 @@ public class GameManager : MonoBehaviour
     private void StartLevel(Scene scene)
     {
         bool isLevel = TryParseLevel(scene.name, out _, out _);
-        hud.SetVisible(isLevel && scene.name != "2-2");
+        hud.SetVisible(isLevel);
 
         timerRunning = false;
         playerMovement = null;
@@ -307,16 +307,13 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        // Preserve the aquatic HUD and its 180-second clock as the sole
-        // owners of the 2-2 display and countdown, including scene transitions.
+        // El 2-2 conserva su reloj acuatico, pero usa el HUD general del equipo
+        // para monedas, puntuacion, mundo y tiempo.
         if (scene.name == "2-2")
         {
             aquaticTimer = FindAnyObjectByType<TemporizadorAcuatico>();
             if (aquaticTimer == null) {
                 aquaticTimer = new GameObject("Temporizador Acuatico").AddComponent<TemporizadorAcuatico>();
-            }
-            if (FindAnyObjectByType<HudAcuatico>() == null) {
-                HudAcuatico.PrepararHud();
             }
             time = aquaticTimer.tiempoRestante;
         }
