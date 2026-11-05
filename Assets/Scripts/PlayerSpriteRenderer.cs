@@ -20,8 +20,13 @@ public class PlayerSpriteRenderer : MonoBehaviour
     {
         if (movement.swimming && !movement.grounded)
         {
-            // swim cycle reusing the existing frames: stroke pose after a
-            // stroke, slow leg kicks with the run frames while gliding
+            // El balanceo hace que Mario se vea nadando y no simplemente
+            // flotando mientras cambia entre los sprites existentes.
+            float swimTilt = movement.stroking
+                ? -12f
+                : Mathf.Sin(Time.time * 7f) * 6f;
+
+            transform.localRotation = Quaternion.Euler(0f, 0f, swimTilt);
             run.enabled = false;
 
             if (movement.stroking || run.sprites.Length == 0) {
@@ -33,6 +38,7 @@ public class PlayerSpriteRenderer : MonoBehaviour
             return;
         }
 
+        transform.localRotation = Quaternion.identity;
         run.enabled = movement.running;
 
         if (movement.jumping) {
@@ -51,6 +57,7 @@ public class PlayerSpriteRenderer : MonoBehaviour
 
     private void OnDisable()
     {
+        transform.localRotation = Quaternion.identity;
         spriteRenderer.enabled = false;
         run.enabled = false;
     }

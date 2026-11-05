@@ -6,14 +6,17 @@ using UnityEngine;
 public class WaterZone : MonoBehaviour
 {
     public Sprite bubbleSprite;
-    public float bubbleInterval = 1.5f;
+    public float bubbleInterval = 0.9f;
+    public float ambientBubbleInterval = 1.8f;
 
-    // TEMPORARY diagnostics: logs when Mario starts / stops swimming
-    public bool logEvents = true;
+    // Logs opcionales para depurar la entrada y salida del agua.
+    // Se mantienen apagados durante el juego normal para no llenar la consola.
+    public bool logEvents = false;
 
     private BoxCollider2D area;
     private PlayerMovement swimmer;
     private float nextBubble;
+    private float nextAmbientBubble;
 
     // highest point Mario's center can reach while swimming
     public float surface => area.bounds.max.y - 0.5f;
@@ -33,6 +36,19 @@ public class WaterZone : MonoBehaviour
 
     private void Start()
     {
+        Camera camera = Camera.main;
+
+        if (camera != null)
+        {
+            SideScrolling scrolling = camera.GetComponent<SideScrolling>();
+
+            if (scrolling != null)
+            {
+                scrolling.smoothTime = 0.12f;
+                scrolling.lookAhead = 2f;
+            }
+        }
+
         // Mario may spawn already inside the water
         PlayerMovement movement = FindAnyObjectByType<PlayerMovement>();
 
@@ -85,10 +101,34 @@ public class WaterZone : MonoBehaviour
             return;
         }
 
-        if (Input.GetButtonDown("Jump") || Time.time >= nextBubble)
+        if (Input.GetButtonDown("Jump"))
+        {
+            nextBubble = Time.time + bubbleInterval;
+            Vector3 origin = swimmer.transform.position + new Vector3(0.3f, 0.5f);
+
+            Bubble.Spawn(bubbleSprite, origin, area.bounds.max.y - 0.5f);
+            Bubble.Spawn(bubbleSprite, origin + new Vector3(-0.18f, -0.12f), area.bounds.max.y - 0.5f);
+        }
+        else if (Time.time >= nextBubble)
         {
             nextBubble = Time.time + bubbleInterval;
             Bubble.Spawn(bubbleSprite, swimmer.transform.position + new Vector3(0.3f, 0.5f), area.bounds.max.y - 0.5f);
+        }
+
+        if (Time.time >= nextAmbientBubble)
+        {
+            nextAmbientBubble = Time.time + ambientBubbleInterval;
+
+            Camera camera = Camera.main;
+
+            if (camera != null)
+            {
+                float halfWidth = camera.orthographicSize * camera.aspect;
+                float x = Random.Range(camera.transform.position.x - halfWidth, camera.transform.position.x + halfWidth);
+                float y = Random.Range(area.bounds.min.y + 1f, area.bounds.max.y - 2f);
+
+                Bubble.Spawn(bubbleSprite, new Vector3(x, y, 0f), area.bounds.max.y - 0.5f);
+            }
         }
     }
 
