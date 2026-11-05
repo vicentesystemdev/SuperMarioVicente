@@ -69,6 +69,7 @@ public static class AplicarMejorasCarlaAcuatico
         PrepararSalida(scene);
         PrepararCamara(scene);
         PrepararAgua(scene);
+        PrepararBloquesPoder(scene);
 
         EditorSceneManager.MarkSceneDirty(scene);
         EditorSceneManager.SaveScene(scene);
@@ -163,6 +164,37 @@ public static class AplicarMejorasCarlaAcuatico
                 zone.logEvents = false;
             }
         }
+    }
+
+    private static void PrepararBloquesPoder(Scene scene)
+    {
+        GameObject oldGroup = FindRoot(scene, "Poderes Acuaticos");
+        if (oldGroup != null)
+            Object.DestroyImmediate(oldGroup);
+
+        GameObject group = new GameObject("Poderes Acuaticos");
+        SceneManager.MoveGameObjectToScene(group, scene);
+
+        CrearBloquePoder(group.transform, new Vector3(28f, -9f, 0f), "MagicMushroom", "Bloque Super Hongo");
+        CrearBloquePoder(group.transform, new Vector3(62f, -7f, 0f), "Starman", "Bloque Estrella");
+        CrearBloquePoder(group.transform, new Vector3(94f, -11f, 0f), "1upMushroom", "Bloque Vida Extra");
+    }
+
+    private static void CrearBloquePoder(Transform parent, Vector3 position, string itemName, string objectName)
+    {
+        GameObject blockPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/MysteryBlock.prefab");
+        GameObject itemPrefab = AssetDatabase.LoadAssetAtPath<GameObject>($"Assets/Prefabs/{itemName}.prefab");
+
+        if (blockPrefab == null || itemPrefab == null)
+            return;
+
+        GameObject block = (GameObject)PrefabUtility.InstantiatePrefab(blockPrefab, parent);
+        block.name = objectName;
+        block.transform.position = position;
+
+        BlockHit hit = block.GetComponent<BlockHit>();
+        if (hit != null)
+            hit.item = itemPrefab;
     }
 
     private static void CrearTexto(string name, Transform parent, string value, Vector2 position)
