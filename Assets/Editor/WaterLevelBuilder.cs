@@ -208,6 +208,11 @@ public static class WaterLevelBuilder
         GameObject gameManager = new GameObject("Game Manager");
         gameManager.AddComponent<GameManager>();
 
+        GameObject levelSettings = new GameObject("Level Settings");
+        LevelSettings settings = levelSettings.AddComponent<LevelSettings>();
+        settings.timeLimit = 120;
+        settings.secondsPerTick = 0.5f;
+
         GameObject music = new GameObject("Music", typeof(AudioSource));
         music.GetComponent<AudioSource>().playOnAwake = false;
         music.AddComponent<LevelMusic>().theme = LevelMusic.Theme.Water;
@@ -239,75 +244,6 @@ public static class WaterLevelBuilder
         barrierCollider.size = new Vector2(190f, 1f);
 
         BuildCamera();
-        BuildHUD();
-    }
-
-    private static void BuildHUD()
-    {
-        GameObject canvasObject = new GameObject(
-            "HUD Acuatico",
-            typeof(RectTransform),
-            typeof(Canvas),
-            typeof(CanvasScaler),
-            typeof(GraphicRaycaster)
-        );
-
-        Canvas canvas = canvasObject.GetComponent<Canvas>();
-        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-        canvas.sortingOrder = 20;
-
-        canvasObject.AddComponent<HudAcuatico>();
-
-        CanvasScaler scaler = canvasObject.GetComponent<CanvasScaler>();
-        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-        scaler.referenceResolution = new Vector2(1920f, 1080f);
-        scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
-        scaler.matchWidthOrHeight = 0.5f;
-
-        GameObject bar = new GameObject("Barra Superior", typeof(RectTransform), typeof(Image));
-        bar.transform.SetParent(canvasObject.transform, false);
-
-        RectTransform rect = bar.GetComponent<RectTransform>();
-        rect.anchorMin = new Vector2(0f, 1f);
-        rect.anchorMax = new Vector2(1f, 1f);
-        rect.pivot = new Vector2(0.5f, 1f);
-        rect.anchoredPosition = Vector2.zero;
-        rect.sizeDelta = new Vector2(0f, 150f);
-
-        Image image = bar.GetComponent<Image>();
-        image.color = new Color(0.015f, 0.04f, 0.12f, 0.72f);
-        image.raycastTarget = false;
-
-        CreateHudText("Mario Label", bar.transform, "MARIO", new Vector2(190f, -42f), 5f);
-        CreateHudText("Score Label", bar.transform, "000000", new Vector2(190f, -92f), 5f);
-        CreateHudText("World Label", bar.transform, "MUNDO 2-2", new Vector2(960f, -42f), 5f);
-        CreateHudText("Time Label", bar.transform, "TIEMPO", new Vector2(1460f, -42f), 5f);
-        CreateHudText("Time Value", bar.transform, "120", new Vector2(1460f, -92f), 5f);
-        CreateHudText("Coins Label", bar.transform, "MONEDAS", new Vector2(570f, -42f), 5f);
-        CreateHudText("Coins Value", bar.transform, "X00", new Vector2(570f, -92f), 5f);
-    }
-
-    private static PixelText CreateHudText(string name, Transform parent, string value, Vector2 position, float pixelSize)
-    {
-        GameObject textObject = new GameObject(name, typeof(RectTransform), typeof(RawImage), typeof(PixelText));
-        textObject.transform.SetParent(parent, false);
-
-        RectTransform rect = textObject.GetComponent<RectTransform>();
-        rect.anchorMin = new Vector2(0f, 1f);
-        rect.anchorMax = new Vector2(0f, 1f);
-        rect.pivot = new Vector2(0.5f, 0.5f);
-        rect.anchoredPosition = position;
-
-        RawImage image = textObject.GetComponent<RawImage>();
-        image.raycastTarget = false;
-
-        PixelText text = textObject.GetComponent<PixelText>();
-        text.text = value;
-        text.pixelSize = pixelSize;
-        text.color = Color.white;
-        text.Refresh();
-
-        return text;
     }
 
     private static void BuildCamera()
@@ -690,7 +626,6 @@ public static class WaterLevelBuilder
         Fish component = fish.GetComponent<Fish>();
         component.speed = speed;
         component.waveAmplitude = amplitude;
-        component.puntos = 200;
         Record(component);
 
         // faster fish are tinted red so the player can read the danger
@@ -704,10 +639,7 @@ public static class WaterLevelBuilder
 
     private static void AddJellyfish(Section s, int x, float y)
     {
-        GameObject jellyfish = Place("Water/Jellyfish", s.enemies, s.x + x, y);
-        Jellyfish jelly = jellyfish.GetComponent<Jellyfish>();
-        jelly.puntos = 300;
-        Record(jelly);
+        Place("Water/Jellyfish", s.enemies, s.x + x, y);
     }
 
     private static void Seaweed(Section s, int x)
