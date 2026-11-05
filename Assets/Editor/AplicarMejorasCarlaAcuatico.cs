@@ -72,6 +72,7 @@ public static class AplicarMejorasCarlaAcuatico
         PrepararBloquesPoder(scene);
         PrepararFaunaNueva(scene);
         PrepararCorrientes(scene);
+        PrepararMusicaDinamica(scene);
 
         EditorSceneManager.MarkSceneDirty(scene);
         EditorSceneManager.SaveScene(scene);
@@ -166,6 +167,24 @@ public static class AplicarMejorasCarlaAcuatico
                 zone.logEvents = false;
             }
         }
+    }
+
+    private static void PrepararMusicaDinamica(Scene scene)
+    {
+        GameObject musicObject = FindRoot(scene, "Music");
+
+        if (musicObject == null)
+            return;
+
+        LevelMusic levelMusic = musicObject.GetComponent<LevelMusic>();
+        if (levelMusic != null)
+            levelMusic.theme = LevelMusic.Theme.Water;
+
+        MusicaAcuaticaDinamica dynamicMusic = musicObject.GetComponent<MusicaAcuaticaDinamica>();
+        if (dynamicMusic == null)
+            dynamicMusic = musicObject.AddComponent<MusicaAcuaticaDinamica>();
+
+        dynamicMusic.cambioX = 58f;
     }
 
     private static void PrepararCorrientes(Scene scene)
