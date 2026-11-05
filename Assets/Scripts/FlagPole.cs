@@ -14,6 +14,8 @@ public class FlagPole : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
+            // stops the clock and adds the time bonus (only once)
+            GameManager.Instance.LevelComplete();
             Sfx.Play(ChiptuneSynth.Flag);
 
             LevelMusic music = FindAnyObjectByType<LevelMusic>();

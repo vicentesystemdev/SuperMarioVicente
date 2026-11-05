@@ -16,13 +16,35 @@ public class GameManager : MonoBehaviour
     public int coins { get; private set; }
     public bool resetting { get; private set; }
 
+    // points (NES values)
+    public const int CoinPoints = 200;
+    public const int StompPoints = 100;
+    public const int EnemyKillPoints = 200;
+    public const int PowerUpPoints = 1000;
+    public const int BossPoints = 5000;
+    public const int TimeBonusPoints = 50;
+
+    // level timer, a LevelSettings component in the scene overrides these
+    public const int DefaultTimeLimit = 400;
+    public const float DefaultSecondsPerTick = 0.5f;
+    public const int HurryUpTime = 100;
+
+    public int score { get; private set; }
+    public int time { get; private set; }
+    public bool timerRunning { get; private set; }
+    public bool hurryUp => timerRunning && time <= HurryUpTime;
+
     // optional, a synthesized jingle is used when left empty
     public AudioClip deathSound;
     public float fadeDuration = 0.5f;
 
     private AudioSource audioSource;
     private ScreenFader fader;
+    private GameHud hud;
     private Coroutine resetRoutine;
+    private float secondsPerTick = DefaultSecondsPerTick;
+    private float tickTimer;
+    private PlayerMovement playerMovement;
 
     // checkpoint of the current level, kept while the level is reloaded
     // after a death and cleared when another level or a new game starts
@@ -47,6 +69,7 @@ public class GameManager : MonoBehaviour
 
             audioSource.playOnAwake = false;
             fader = ScreenFader.Create(transform);
+            hud = GameHud.Create(transform);
         }
     }
 
@@ -69,6 +92,7 @@ public class GameManager : MonoBehaviour
             ResetGameState();
             this.world = world;
             this.stage = stage;
+            StartLevel(SceneManager.GetActiveScene());
         }
         else
         {
@@ -94,6 +118,7 @@ public class GameManager : MonoBehaviour
         hasCheckpoint = false;
         lives = StartingLives;
         coins = 0;
+        score = 0;
 
         Debug.Log($"[GameManager] Nueva partida: {lives} vidas");
     }
@@ -146,7 +171,10 @@ public class GameManager : MonoBehaviour
 
     public void Victory()
     {
-        Debug.Log($"[GameManager] ¡Victoria! Monedas: {coins}, vidas: {lives}");
+        // the castle goal has no flag pole, the time bonus is added here
+        LevelComplete();
+
+        Debug.Log($"[GameManager] ¡Victoria! Puntos: {score}, monedas: {coins}, vidas: {lives}");
         hasCheckpoint = false;
 
         if (Application.CanStreamedLevelBeLoaded(VictoryScene)) {
@@ -171,6 +199,7 @@ public class GameManager : MonoBehaviour
         }
 
         resetting = true;
+        timerRunning = false;
 
         audioSource.PlayOneShot(deathSound != null ? deathSound : ChiptuneSynth.DeathJingle);
         resetRoutine = StartCoroutine(ResetLevelRoutine(delay));
@@ -205,6 +234,95 @@ public class GameManager : MonoBehaviour
         if (fader.alpha > 0f) {
             StartCoroutine(fader.FadeTo(0f, fadeDuration));
         }
+
+        StartLevel(scene);
+    }
+
+    // restarts the timer and shows the HUD in level scenes, the GameOver
+    // and Victory scenes have their own stats so the HUD is hidden there
+    private void StartLevel(Scene scene)
+    {
+        bool isLevel = TryParseLevel(scene.name, out _, out _);
+        hud.SetVisible(isLevel);
+
+        timerRunning = false;
+        playerMovement = null;
+
+        if (!isLevel) {
+            return;
+        }
+
+        LevelSettings settings = FindAnyObjectByType<LevelSettings>();
+        time = settings != null ? settings.timeLimit : DefaultTimeLimit;
+        secondsPerTick = settings != null ? settings.secondsPerTick : DefaultSecondsPerTick;
+        tickTimer = 0f;
+        timerRunning = true;
+
+        Player player = FindAnyObjectByType<Player>();
+
+        if (player != null) {
+            playerMovement = player.GetComponent<PlayerMovement>();
+        }
+    }
+
+    private void Update()
+    {
+        if (!timerRunning || resetting) {
+            return;
+        }
+
+        // the clock stops while Mario has no control (pipes, flag pole,
+        // castle goal), so the level ending can never run out of time
+        if (playerMovement == null || !playerMovement.enabled) {
+            return;
+        }
+
+        tickTimer += Time.deltaTime;
+
+        while (tickTimer >= secondsPerTick && time > 0)
+        {
+            tickTimer -= secondsPerTick;
+            time--;
+        }
+
+        if (time <= 0) {
+            TimeUp();
+        }
+    }
+
+    private void TimeUp()
+    {
+        timerRunning = false;
+        Debug.Log("[GameManager] Tiempo agotado");
+
+        Player player = playerMovement != null ? playerMovement.GetComponent<Player>() : null;
+
+        // the normal death sequence costs the life and plays the jingle
+        if (player != null && player.gameObject.activeInHierarchy) {
+            player.Death();
+        } else {
+            ResetLevel(3f);
+        }
+    }
+
+    // stops the clock and converts the remaining time into points, only
+    // the first call of a level counts
+    public void LevelComplete()
+    {
+        if (!timerRunning) {
+            return;
+        }
+
+        timerRunning = false;
+        AddScore(time * TimeBonusPoints);
+        Debug.Log($"[GameManager] Nivel completado: bonus de tiempo {time} x {TimeBonusPoints}");
+    }
+
+    public void AddScore(int points)
+    {
+        if (points > 0) {
+            score = Mathf.Min(score + points, 999999);
+        }
     }
 
     private static bool TryParseLevel(string sceneName, out int world, out int stage)
@@ -219,6 +337,7 @@ public class GameManager : MonoBehaviour
     public void AddCoin()
     {
         coins++;
+        AddScore(CoinPoints);
 
         if (coins == 100)
         {

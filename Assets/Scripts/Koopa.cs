@@ -7,10 +7,11 @@ public class Koopa : MonoBehaviour
 
     private bool shelled;
     private bool pushed;
+    private bool defeated;
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (!shelled && collision.gameObject.CompareTag("Player"))
+        if (!defeated && !shelled && collision.gameObject.CompareTag("Player"))
         {
             Player player = collision.gameObject.GetComponent<Player>();
 
@@ -26,6 +27,10 @@ public class Koopa : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
+        if (defeated) {
+            return;
+        }
+
         if (shelled && other.CompareTag("Player"))
         {
             if (!pushed)
@@ -53,6 +58,7 @@ public class Koopa : MonoBehaviour
     private void EnterShell()
     {
         shelled = true;
+        GameManager.Instance.AddScore(GameManager.StompPoints);
         Sfx.Play(ChiptuneSynth.Stomp);
 
         GetComponent<SpriteRenderer>().sprite = shellSprite;
@@ -77,6 +83,10 @@ public class Koopa : MonoBehaviour
 
     private void Hit()
     {
+        defeated = true;
+        GameManager.Instance.AddScore(GameManager.EnemyKillPoints);
+        Sfx.Play(ChiptuneSynth.Kick);
+
         GetComponent<AnimatedSprite>().enabled = false;
         GetComponent<DeathAnimation>().enabled = true;
         Destroy(gameObject, 3f);
