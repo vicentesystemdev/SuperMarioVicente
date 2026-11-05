@@ -339,7 +339,8 @@ public static class WaterLevelBuilder
 
     private static void Section1(Section s)
     {
-        Mystery(s, 8, -10, null);
+        Mystery(s, 8, -10, "MagicMushroom");
+        Mystery(s, 28, -9, "Starman");
 
         Coral(s, 14, 2);
         Coral(s, 24, 3);
@@ -373,6 +374,8 @@ public static class WaterLevelBuilder
         Coin(s, 31, -8); Coin(s, 31, -7);
         Coin(s, 43, -12); Coin(s, 43, -11);
         Coin(s, 49, -13);
+
+        Mystery(s, 38, -10, "1upMushroom");
 
         AddFish(s, 12, -6f, 2f, 0.5f);
         AddFish(s, 26, -12f, 2f, 0.4f);
