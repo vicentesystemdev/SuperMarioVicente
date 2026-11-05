@@ -12,7 +12,7 @@ public class HudAcuatico : MonoBehaviour
     private int lastTime = -1;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-    private static void PrepararHud()
+    public static void PrepararHud()
     {
         if (SceneManager.GetActiveScene().name != "2-2")
             return;
