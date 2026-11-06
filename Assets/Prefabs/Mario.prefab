@@ -102,8 +102,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 8
+  runMultiplier: 1.25
+  groundAcceleration: 50
+  groundDeceleration: 65
+  turnAcceleration: 80
+  airAcceleration: 38
+  airDeceleration: 18
   maxJumpHeight: 5
   maxJumpTime: 1
+  coyoteTime: 0.12
+  jumpBufferTime: 0.15
 --- !u!114 &4805063566520083554
 MonoBehaviour:
   m_ObjectHideFlags: 0

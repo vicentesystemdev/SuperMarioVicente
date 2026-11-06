@@ -21,6 +21,7 @@ public static class CastleLevelBuilder
     private const string SpritesFolder = "Assets/Sprites/Castle";
     private const string PrefabFolder = "Assets/Prefabs/Castle";
     private const string Prefabs = "Assets/Prefabs/";
+    private const string CastleMusicPath = "Assets/Audio_level4/BAD BUNNY - DtMF (Visualizer)  DeBÍ TiRAR MáS FOToS.mp3";
 
     private const float LowerStand = 2f;     // Mario / enemies on the lower floor
     private const float UpperStand = 30f;    // Mario / enemies on the upper floor
@@ -287,9 +288,17 @@ public static class CastleLevelBuilder
         gameManager.AddComponent<GameManager>();
 
         GameObject musicObject = new GameObject("Music", typeof(AudioSource));
-        musicObject.GetComponent<AudioSource>().playOnAwake = false;
+        AudioSource audioSource = musicObject.GetComponent<AudioSource>();
+        audioSource.playOnAwake = false;
         music = musicObject.AddComponent<LevelMusic>();
         music.theme = LevelMusic.Theme.Castle;
+
+        AudioClip customClip = AssetDatabase.LoadAssetAtPath<AudioClip>(CastleMusicPath);
+        if (customClip != null)
+        {
+            music.music = customClip;
+            audioSource.clip = customClip;
+        }
 
         Place("Mario", null, 3f, LowerStand);
 
@@ -456,7 +465,7 @@ public static class CastleLevelBuilder
 
         Spikes(s, 62, 2, 3, false);
 
-        Mystery(s, 66, 5, null);
+        Mystery(s, 66, 5, "MagicMushroom");
         Mystery(s, 67, 5, null);
         Enemy(s, "Goomba", 69, LowerStand);
 
@@ -486,18 +495,18 @@ public static class CastleLevelBuilder
         Torch(s, 119, 7); Torch(s, 140, 9); Torch(s, 170, 9); Torch(s, 183, 7);
 
         // pillars rising from the lava, moving platforms and a crumbling bridge
-        Tile("Castle/Stone", s.terrain, 125, 0, 2, 4, "Pillar");
-        Tile("Castle/Stone", s.terrain, 131, 0, 2, 5, "Pillar");
-        AddMovingPlatform(s, 136, 4, 3, new Vector2(9f, 0f), 4.5f, 0f);
-        Tile("Castle/Stone", s.terrain, 150, 0, 2, 6, "Pillar");
-        Tile("Castle/Stone", s.terrain, 155, 0, 1, 6, "Pillar");
+        Tile("Castle/Stone", s.terrain, 125, 0, 3, 4, "Pillar");
+        Tile("Castle/Stone", s.terrain, 131, 0, 3, 5, "Pillar");
+        AddMovingPlatform(s, 136, 4, 4, new Vector2(9f, 0f), 4.5f, 0f);
+        Tile("Castle/Stone", s.terrain, 150, 0, 3, 6, "Pillar");
+        Tile("Castle/Stone", s.terrain, 155, 0, 2, 6, "Pillar");
 
         for (int x = 158; x <= 163; x++) {
             Crumble(s, x, 5);
         }
 
-        Tile("Castle/Stone", s.terrain, 167, 0, 2, 5, "Pillar");
-        AddMovingPlatform(s, 171, 4, 3, new Vector2(5f, 0f), 3.2f, 0.25f);
+        Tile("Castle/Stone", s.terrain, 167, 0, 3, 5, "Pillar");
+        AddMovingPlatform(s, 171, 4, 4, new Vector2(5f, 0f), 3.2f, 0.25f);
 
         Spark(s, 128.5f, 5f, 3f, 0f);
         Spark(s, 141f, 6f, 3.5f, 1f);
@@ -541,18 +550,19 @@ public static class CastleLevelBuilder
         Torch(s, 249, 10); Torch(s, 284, 14); Torch(s, 249, 28); Torch(s, 284, 24);
 
         // zig-zag climb (3 tiles between floors, 2 tile gaps)
-        int[,] platforms = { { 250, 4 }, { 257, 7 }, { 264, 10 }, { 257, 13 }, { 250, 16 }, { 257, 19 }, { 269, 25 } };
+        int[,] platforms = { { 250, 4 }, { 257, 7 }, { 264, 10 }, { 257, 13 }, { 250, 16 }, { 257, 19 }, { 268, 26 } };
 
         for (int i = 0; i < platforms.GetLength(0); i++)
         {
             int x = platforms[i, 0];
             int y = platforms[i, 1];
-            Tile("Castle/Stone", s.terrain, x, y, 5, 1, "Tower Platform");
+            int width = i == platforms.GetLength(0) - 1 ? 6 : 5;
+            Tile("Castle/Stone", s.terrain, x, y, width, 1, "Tower Platform");
             Coin(s, x + 2, y + 2);
         }
 
         // elevator from the 6th platform up to the last one
-        AddMovingPlatform(s, 264, 19, 3, new Vector2(0f, 6f), 5f, 0f);
+        AddMovingPlatform(s, 264, 19, 4, new Vector2(0f, 7f), 4.5f, 0f);
 
         AddFirebar(s, 262, 16, 5, 70f);
         Cannon(s, 248, 22, Vector2.right, 3f, 0.5f);
@@ -560,19 +570,19 @@ public static class CastleLevelBuilder
 
     private static void Section6(Section s)
     {
-        AddCheckpoint(s, 292, UpperFloorTop);
+        AddCheckpoint(s, 295, UpperFloorTop);
         Torch(s, 296, 35); Torch(s, 312, 35); Torch(s, 322, 35);
 
         // supplies before the boss
         Mystery(s, 298, 33, "MagicMushroom");
-        Mystery(s, 300, 33, null);
+        Mystery(s, 300, 33, "MagicMushroom");
         Mystery(s, 302, 33, "1upMushroom");
 
         for (int x = 306; x <= 310; x++) {
             Coin(s, x, 31);
         }
 
-        Enemy(s, "Goomba", 316, UpperStand);
+        Enemy(s, "Goomba", 290, UpperStand);
     }
 
     private static void Section7(Section s)
@@ -583,10 +593,10 @@ public static class CastleLevelBuilder
         entryGate.gameObject.SetActive(false);
         Gate exitGate = Tile("Castle/Gate", s.terrain, 376, 30, 1, 10, "Exit Gate").GetComponent<Gate>();
 
-        // platforms to dodge the fire
-        Tile("Castle/Stone", s.terrain, 336, 33, 3, 1, "Arena Platform");
-        Tile("Castle/Stone", s.terrain, 362, 33, 3, 1, "Arena Platform");
-        Tile("Castle/Stone", s.terrain, 349, 36, 3, 1, "Arena Platform");
+        // platforms to dodge the fire and reach Magmor's head
+        Tile("Castle/Stone", s.terrain, 336, 33, 5, 1, "Arena Platform");
+        Tile("Castle/Stone", s.terrain, 359, 33, 5, 1, "Arena Platform");
+        Tile("Castle/Stone", s.terrain, 347, 35, 6, 1, "Arena Platform");
 
         Boss boss = Place("Castle/Boss", s.enemies, 366f, 31f, "Magmor").GetComponent<Boss>();
         boss.minX = 329.5f;

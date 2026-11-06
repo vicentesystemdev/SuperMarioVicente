@@ -11,15 +11,25 @@ public class PlayerMovement : MonoBehaviour
     private float inputAxis;
 
     public float moveSpeed = 8f;
+    public float runMultiplier = 1.25f;
     public float maxJumpHeight = 5f;
     public float maxJumpTime = 1f;
     public float jumpForce => (2f * maxJumpHeight) / (maxJumpTime / 2f);
     public float gravity => (-2f * maxJumpHeight) / Mathf.Pow(maxJumpTime / 2f, 2f);
 
+    // responsive control tuning (coyote time, jump buffer, snappy traction)
+    public float groundAcceleration = 50f;
+    public float groundDeceleration = 65f;
+    public float turnAcceleration = 80f;
+    public float airAcceleration = 38f;
+    public float airDeceleration = 28f;
+    public float coyoteTime = 0.12f;
+    public float jumpBufferTime = 0.15f;
+
     public bool grounded { get; private set; }
     public bool jumping { get; private set; }
     public bool running => Mathf.Abs(velocity.x) > 0.25f || Mathf.Abs(inputAxis) > 0.25f;
-    public bool sliding => (inputAxis > 0f && velocity.x < 0f) || (inputAxis < 0f && velocity.x > 0f);
+    public bool sliding => (inputAxis > 0f && velocity.x < -0.5f) || (inputAxis < 0f && velocity.x > 0.5f);
     public bool falling => velocity.y < 0f && !grounded;
 
     // swimming, enabled by a WaterZone (land movement is unchanged)
@@ -32,6 +42,8 @@ public class PlayerMovement : MonoBehaviour
     public bool stroking => Time.time - lastStrokeTime < 0.3f;
     private float swimCeiling;
     private float lastStrokeTime = -1f;
+    private float lastGroundedTime = -10f;
+    private float lastJumpPressedTime = -10f;
 
     private Vector2 carry;
 
@@ -82,12 +94,22 @@ public class PlayerMovement : MonoBehaviour
             return;
         }
 
-        HorizontalMovement();
+        if (JumpPressed()) {
+            lastJumpPressedTime = Time.time;
+        }
 
         grounded = rigidbody.Raycast(Vector2.down);
 
+        if (grounded && velocity.y <= 0.05f) {
+            lastGroundedTime = Time.time;
+        }
+
+        HorizontalMovement();
+
         if (grounded) {
             GroundedMovement();
+        } else if (!jumping && Time.time - lastGroundedTime <= coyoteTime) {
+            TryExecuteBufferedJump();
         }
 
         ApplyGravity();
@@ -95,6 +117,10 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (camera == null) {
+            camera = Camera.main;
+        }
+
         // move mario based on his velocity
         Vector2 position = rigidbody.position;
         position += velocity * Time.fixedDeltaTime;
@@ -104,56 +130,99 @@ public class PlayerMovement : MonoBehaviour
         carry = Vector2.zero;
 
         // clamp within the screen bounds
-        Vector2 leftEdge = camera.ScreenToWorldPoint(Vector2.zero);
-        Vector2 rightEdge = camera.ScreenToWorldPoint(new Vector2(Screen.width, Screen.height));
-        position.x = Mathf.Clamp(position.x, leftEdge.x + 0.5f, rightEdge.x - 0.5f);
+        if (camera != null)
+        {
+            Vector2 leftEdge = camera.ScreenToWorldPoint(Vector2.zero);
+            Vector2 rightEdge = camera.ScreenToWorldPoint(new Vector2(Screen.width, Screen.height));
+            position.x = Mathf.Clamp(position.x, leftEdge.x + 0.5f, rightEdge.x - 0.5f);
+        }
 
         rigidbody.MovePosition(position);
     }
 
     private void HorizontalMovement()
     {
-        // accelerate / decelerate
-        inputAxis = Input.GetAxis("Horizontal");
-        velocity.x = Mathf.MoveTowards(velocity.x, inputAxis * moveSpeed, moveSpeed * Time.deltaTime);
+        // responsive raw horizontal input with analog fallback
+        float raw = Input.GetAxisRaw("Horizontal");
+        inputAxis = Mathf.Abs(raw) > 0.01f ? raw : Input.GetAxis("Horizontal");
+
+        bool sprinting = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)
+                      || Input.GetKey(KeyCode.Z) || Input.GetKey(KeyCode.X);
+        float targetSpeed = inputAxis * moveSpeed * (sprinting ? runMultiplier : 1f);
+
+        float accel;
+        if (Mathf.Abs(inputAxis) < 0.01f) {
+            accel = grounded ? groundDeceleration : airDeceleration;
+        } else if ((inputAxis > 0f && velocity.x < 0f) || (inputAxis < 0f && velocity.x > 0f)) {
+            accel = turnAcceleration;
+        } else {
+            accel = grounded ? groundAcceleration : airAcceleration;
+        }
+
+        velocity.x = Mathf.MoveTowards(velocity.x, targetSpeed, accel * Time.deltaTime);
 
         // check if running into a wall
-        if (rigidbody.Raycast(Vector2.right * velocity.x)) {
+        if (Mathf.Abs(velocity.x) > 0.01f && rigidbody.Raycast(Vector2.right * Mathf.Sign(velocity.x))) {
             velocity.x = 0f;
         }
 
-        // flip sprite to face direction
-        if (velocity.x > 0f) {
+        // flip sprite to face input / movement direction immediately
+        if (inputAxis > 0.01f || (Mathf.Abs(inputAxis) <= 0.01f && velocity.x > 0.1f)) {
             transform.eulerAngles = Vector3.zero;
-        } else if (velocity.x < 0f) {
+        } else if (inputAxis < -0.01f || (Mathf.Abs(inputAxis) <= 0.01f && velocity.x < -0.1f)) {
             transform.eulerAngles = new Vector3(0f, 180f, 0f);
         }
     }
 
     private void GroundedMovement()
     {
-        // prevent gravity from infinitly building up
-        velocity.y = Mathf.Max(velocity.y, 0f);
-        jumping = velocity.y > 0f;
+        // prevent gravity from infinitely building up
+        if (velocity.y < 0f) {
+            velocity.y = 0f;
+        }
+        jumping = velocity.y > 0.05f;
 
-        // perform jump
-        if (Input.GetButtonDown("Jump"))
+        TryExecuteBufferedJump();
+    }
+
+    private void TryExecuteBufferedJump()
+    {
+        if (Time.time - lastJumpPressedTime <= jumpBufferTime)
         {
             velocity.y = jumpForce;
             jumping = true;
+            lastJumpPressedTime = -10f;
+            lastGroundedTime = -10f;
             Sfx.Play(ChiptuneSynth.Jump);
         }
     }
 
     private void ApplyGravity()
     {
-        // check if falling
-        bool falling = velocity.y < 0f || !Input.GetButton("Jump");
-        float multiplier = falling ? 2f : 1f;
+        bool jumpHeld = JumpHeld();
+        bool fallingNow = velocity.y < 0f || !jumpHeld;
+
+        // slight hang-time near jump apex when holding jump for precision platforming
+        float multiplier;
+        if (jumping && jumpHeld && Mathf.Abs(velocity.y) < 2.2f) {
+            multiplier = 0.8f;
+        } else {
+            multiplier = fallingNow ? 2f : 1f;
+        }
 
         // apply gravity and terminal velocity
         velocity.y += gravity * multiplier * Time.deltaTime;
         velocity.y = Mathf.Max(velocity.y, gravity / 2f);
+    }
+
+    private static bool JumpPressed()
+    {
+        return Input.GetButtonDown("Jump") || Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow);
+    }
+
+    private static bool JumpHeld()
+    {
+        return Input.GetButton("Jump") || Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow);
     }
 
     public void SetSwimming(bool swimming, float ceiling = 0f)

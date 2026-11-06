@@ -36,16 +36,17 @@ public class MovingPlatform : MonoBehaviour
         Vector2 target = start + offset * k;
         Vector2 delta = target - body.position;
 
+        bool carrying = player != null && IsCarrying();
         body.MovePosition(target);
 
-        if (player != null && IsCarrying()) {
+        if (carrying) {
             player.Carry(delta / Time.fixedDeltaTime);
         }
     }
 
     private bool IsCarrying()
     {
-        if (!player.enabled || !player.grounded) {
+        if (!player.enabled || player.jumping || !player.grounded) {
             return false;
         }
 
@@ -53,9 +54,9 @@ public class MovingPlatform : MonoBehaviour
         Vector3 position = player.transform.position;
         float feet = position.y - 0.5f;
 
-        return Mathf.Abs(feet - bounds.max.y) < 0.25f
-            && position.x >= bounds.min.x - 0.45f
-            && position.x <= bounds.max.x + 0.45f;
+        return Mathf.Abs(feet - bounds.max.y) < 0.35f
+            && position.x >= bounds.min.x - 0.48f
+            && position.x <= bounds.max.x + 0.48f;
     }
 
 }
