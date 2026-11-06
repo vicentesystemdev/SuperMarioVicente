@@ -180,7 +180,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Boss
   maxHealth: 6
-  walkSpeed: 2.2
+  walkSpeed: 2.8
+  acceleration: 28
   gravity: -30
   invulnerableTime: 1.2
   minX: 0

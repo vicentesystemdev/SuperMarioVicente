@@ -20,10 +20,13 @@ public class LevelMusic : MonoBehaviour
         source.loop = true;
         source.volume = volume;
 
+        if (music == null && source.clip != null) {
+            music = source.clip;
+        }
+
         if (music != null)
         {
-            source.clip = music;
-            source.Play();
+            PlayCustomClip();
         }
         else
         {
@@ -38,7 +41,8 @@ public class LevelMusic : MonoBehaviour
         }
     }
 
-    // switches to another synthesized theme (e.g. when the boss fight starts)
+    // switches to another synthesized theme (e.g. when the boss fight starts),
+    // unless a custom AudioClip is assigned for the whole scene
     public void Play(Theme theme)
     {
         if (source == null) {
@@ -46,7 +50,26 @@ public class LevelMusic : MonoBehaviour
         }
 
         this.theme = theme;
+
+        if (music != null)
+        {
+            if (source.clip != music || !source.isPlaying) {
+                PlayCustomClip();
+            }
+            return;
+        }
+
         source.clip = Clip(theme);
+        source.Play();
+    }
+
+    private void PlayCustomClip()
+    {
+        if (music.loadState == AudioDataLoadState.Unloaded) {
+            music.LoadAudioData();
+        }
+
+        source.clip = music;
         source.Play();
     }
 

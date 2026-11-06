@@ -14,7 +14,8 @@ using UnityEngine;
 public class Boss : MonoBehaviour
 {
     public int maxHealth = 6;
-    public float walkSpeed = 2.2f;
+    public float walkSpeed = 2.8f;
+    public float acceleration = 28f;
     public float gravity = -30f;
     public float invulnerableTime = 1.2f;
     public float minX;
@@ -39,6 +40,10 @@ public class Boss : MonoBehaviour
     private Collider2D bossCollider;
     private Transform player;
     private Vector2 velocity;
+    private float targetVelocityX;
+    private Vector3 baseScale = Vector3.one;
+    private Vector3 targetScale = Vector3.one;
+    private bool wasGrounded = true;
     private float invulnerableUntil;
     private bool fighting;
     private bool attacking;
@@ -53,6 +58,8 @@ public class Boss : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
         bossCollider = GetComponent<Collider2D>();
         health = maxHealth;
+        baseScale = transform.localScale;
+        targetScale = baseScale;
     }
 
     private void Start()
@@ -87,14 +94,27 @@ public class Boss : MonoBehaviour
             return;
         }
 
+        bool isOnGround = OnGround();
+        velocity.x = Mathf.MoveTowards(velocity.x, targetVelocityX, acceleration * Time.fixedDeltaTime);
         velocity.y += gravity * Time.fixedDeltaTime;
 
-        if (velocity.y < 0f && OnGround()) {
+        if (velocity.y < 0f && isOnGround)
+        {
+            if (!wasGrounded && velocity.y < -6f) {
+                PulseScale(1.18f, 0.84f);
+            }
             velocity.y = 0f;
         }
 
+        wasGrounded = isOnGround && velocity.y <= 0f;
+
         Vector2 position = body.position + velocity * Time.fixedDeltaTime;
-        position.x = Mathf.Clamp(position.x, minX, maxX);
+        if (position.x <= minX || position.x >= maxX)
+        {
+            position.x = Mathf.Clamp(position.x, minX, maxX);
+            velocity.x = 0f;
+        }
+
         body.MovePosition(position);
     }
 
@@ -109,12 +129,35 @@ public class Boss : MonoBehaviour
             spriteRenderer.flipX = player.position.x > transform.position.x;
         }
 
-        if (!attacking) {
-            spriteRenderer.sprite = Mathf.FloorToInt(Time.time * 2.5f) % 2 == 0 ? idle1 : idle2;
+        if (!attacking)
+        {
+            float animRate = Mathf.Abs(velocity.x) > 0.5f ? (phaseTwo ? 6f : 4.2f) : 2.5f;
+            spriteRenderer.sprite = Mathf.FloorToInt(Time.time * animRate) % 2 == 0 ? idle1 : idle2;
         }
+
+        // subtle enraged fiery glow in phase 2
+        if (!invulnerable) {
+            spriteRenderer.color = enraged ? new Color(1f, 0.82f, 0.72f) : Color.white;
+        }
+
+        // smooth squash-and-stretch recovery + walking step bounce
+        targetScale = Vector3.Lerp(targetScale, baseScale, 10f * Time.deltaTime);
+        Vector3 stepBounce = Vector3.zero;
+        if (grounded && Mathf.Abs(velocity.x) > 0.4f && !attacking)
+        {
+            float bob = Mathf.Sin(Time.time * (phaseTwo ? 16f : 11f)) * 0.05f;
+            stepBounce = new Vector3(-bob * 0.5f, bob, 0f);
+        }
+        transform.localScale = Vector3.Lerp(transform.localScale, targetScale + stepBounce, 16f * Time.deltaTime);
 
         // blink while invulnerable
         spriteRenderer.enabled = !invulnerable || Time.frameCount % 6 < 3;
+    }
+
+    private void PulseScale(float scaleX, float scaleY)
+    {
+        transform.localScale = new Vector3(baseScale.x * scaleX, baseScale.y * scaleY, baseScale.z);
+        targetScale = baseScale;
     }
 
     private bool grounded => velocity.y <= 0f && OnGround();
@@ -136,20 +179,42 @@ public class Boss : MonoBehaviour
     private IEnumerator Brain(bool intro)
     {
         if (intro) {
-            yield return Roar(1f);
+            yield return Roar(0.9f);
         }
+
+        int cycle = 0;
 
         while (!dead)
         {
-            yield return Walk();
+            yield return TacticalMove();
 
-            if (phaseTwo && Random.value < 0.45f) {
-                yield return SlamAttack();
-            } else {
-                yield return Breathe(phaseTwo ? 3 : 1);
+            float roll = Random.value;
+
+            if (phaseTwo)
+            {
+                if (roll < 0.38f) {
+                    yield return SlamAttack();
+                } else if (roll < 0.65f) {
+                    yield return ChargeAttack();
+                } else if (roll < 0.82f) {
+                    yield return ArcJumpAttack();
+                } else {
+                    yield return Breathe(3);
+                }
+            }
+            else
+            {
+                if (cycle % 3 == 1 || roll < 0.35f) {
+                    yield return ArcJumpAttack();
+                } else if (roll < 0.55f) {
+                    yield return ChargeAttack();
+                } else {
+                    yield return Breathe(1);
+                }
             }
 
-            yield return new WaitForSeconds(phaseTwo ? 0.5f : 0.9f);
+            cycle++;
+            yield return new WaitForSeconds(phaseTwo ? 0.35f : 0.65f);
         }
     }
 
@@ -157,7 +222,9 @@ public class Boss : MonoBehaviour
     {
         attacking = true;
         spriteRenderer.sprite = attack;
+        targetVelocityX = 0f;
         velocity.x = 0f;
+        PulseScale(1.2f, 0.85f);
         Sfx.Play(ChiptuneSynth.BossRoar);
         ShakeCamera(duration * 0.6f, 0.15f);
 
@@ -165,36 +232,161 @@ public class Boss : MonoBehaviour
         attacking = false;
     }
 
-    private IEnumerator Walk()
+    // Smart tactical movement: stalks Mario around an ideal combat range,
+    // weaves with rhythmic Bowser-style hops, and repositions if cornered
+    private IEnumerator TacticalMove()
     {
-        float speed = phaseTwo ? walkSpeed * 1.6f : walkSpeed;
-        float target = Random.Range(minX, maxX);
-        float elapsed = 0f;
+        float speed = phaseTwo ? walkSpeed * 1.65f : walkSpeed;
+        float playerX = player != null ? player.position.x : (minX + maxX) * 0.5f;
+        float distanceToMario = playerX - body.position.x;
+        float dirToMario = Mathf.Sign(distanceToMario);
+        if (Mathf.Abs(distanceToMario) < 0.1f) {
+            dirToMario = facing;
+        }
 
-        while (Mathf.Abs(target - body.position.x) > 0.2f && elapsed < 2.5f)
+        float target;
+        if (Mathf.Abs(distanceToMario) > 11f)
         {
-            velocity.x = Mathf.Sign(target - body.position.x) * speed;
+            // close the gap toward Mario
+            target = playerX - dirToMario * Random.Range(4.5f, 7.5f);
+        }
+        else if (Mathf.Abs(distanceToMario) < 4.2f)
+        {
+            // Mario is very close: agile back-step or leap over to keep spacing dynamic
+            target = body.position.x - dirToMario * Random.Range(4f, 7f);
+            if (grounded)
+            {
+                PulseScale(0.88f, 1.15f);
+                velocity.y = 9.5f;
+            }
+        }
+        else
+        {
+            // weave around Mario at medium range
+            float offset = Random.value < 0.65f ? Random.Range(3.5f, 7f) : -Random.Range(3.5f, 6f);
+            target = playerX - dirToMario * offset;
+        }
 
-            // small hops in phase 1 keep the movement lively
-            if (!phaseTwo && grounded && Random.value < 0.01f) {
-                velocity.y = 8f;
+        target = Mathf.Clamp(target, minX + 1.5f, maxX - 1.5f);
+
+        float duration = phaseTwo ? Random.Range(1.0f, 1.6f) : Random.Range(1.3f, 2.0f);
+        float elapsed = 0f;
+        float nextHopTime = Random.Range(0.25f, 0.65f);
+
+        while (Mathf.Abs(target - body.position.x) > 0.35f && elapsed < duration && !dead)
+        {
+            targetVelocityX = Mathf.Sign(target - body.position.x) * speed;
+
+            // rhythmic hops so the boss feels lively and Mario can duck under high jumps
+            if (grounded && elapsed >= nextHopTime)
+            {
+                PulseScale(0.9f, 1.14f);
+                velocity.y = Random.value < 0.45f ? 11.5f : 7.8f;
+                nextHopTime = elapsed + Random.Range(0.55f, 1.0f);
             }
 
             elapsed += Time.deltaTime;
             yield return null;
         }
 
+        targetVelocityX = 0f;
+    }
+
+    // Classic Bowser-style high arc jump with a fireball shot near the apex
+    private IEnumerator ArcJumpAttack()
+    {
+        if (!grounded) {
+            yield return new WaitUntil(() => grounded || dead);
+        }
+        if (dead) {
+            yield break;
+        }
+
+        // crouch wind-up before jumping
+        targetVelocityX = 0f;
+        PulseScale(1.2f, 0.8f);
+        yield return new WaitForSeconds(0.18f);
+
+        float dir = player != null ? Mathf.Sign(player.position.x - body.position.x) : facing;
+        float horizSpeed = (phaseTwo ? walkSpeed * 1.45f : walkSpeed * 1.2f) * dir;
+
+        PulseScale(0.85f, 1.18f);
+        velocity.y = 13.2f;
+        velocity.x = horizSpeed;
+        targetVelocityX = horizSpeed;
+
+        // wait until near the apex of the jump, then breathe fire in mid-air
+        yield return new WaitForSeconds(0.28f);
+
+        if (!dead)
+        {
+            attacking = true;
+            spriteRenderer.sprite = attack;
+            FireProjectiles(phaseTwo ? 2 : 1);
+            yield return new WaitForSeconds(0.22f);
+            attacking = false;
+        }
+
+        yield return new WaitUntil(() => grounded || dead);
+        targetVelocityX = 0f;
+    }
+
+    // Telegraphed horizontal dash towards Mario, followed by a brief recovery window
+    private IEnumerator ChargeAttack()
+    {
+        targetVelocityX = 0f;
         velocity.x = 0f;
+        attacking = true;
+        spriteRenderer.sprite = attack;
+
+        // wind-up crouch telegraph
+        PulseScale(1.22f, 0.78f);
+        Sfx.Play(ChiptuneSynth.BossRoar);
+        yield return new WaitForSeconds(phaseTwo ? 0.28f : 0.4f);
+
+        float dir = player != null ? Mathf.Sign(player.position.x - body.position.x) : facing;
+        float dashSpeed = walkSpeed * (phaseTwo ? 2.8f : 2.2f);
+        float dashTime = phaseTwo ? 0.65f : 0.55f;
+        float elapsed = 0f;
+
+        PulseScale(1.15f, 0.9f);
+
+        while (elapsed < dashTime && !dead)
+        {
+            targetVelocityX = dir * dashSpeed;
+            velocity.x = dir * dashSpeed;
+
+            if ((dir < 0f && body.position.x <= minX + 1f) || (dir > 0f && body.position.x >= maxX - 1f)) {
+                break;
+            }
+
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        targetVelocityX = 0f;
+        attacking = false;
+        yield return new WaitForSeconds(0.25f);
     }
 
     private IEnumerator Breathe(int count)
     {
+        targetVelocityX = 0f;
         attacking = true;
         spriteRenderer.sprite = attack;
+        PulseScale(1.12f, 0.9f);
 
         // wind up, gives Mario time to react
-        yield return new WaitForSeconds(phaseTwo ? 0.35f : 0.5f);
+        yield return new WaitForSeconds(phaseTwo ? 0.3f : 0.45f);
 
+        FireProjectiles(count);
+
+        yield return new WaitForSeconds(0.3f);
+        attacking = false;
+    }
+
+    private void FireProjectiles(int count)
+    {
         Vector3 mouth = transform.position + new Vector3(facing * 1.1f, 0.3f, 0f);
         Vector2 aim = player != null ? (Vector2)(player.position - mouth) : new Vector2(facing, 0f);
         aim.x = facing * Mathf.Max(Mathf.Abs(aim.x), 0.1f);
@@ -203,34 +395,42 @@ public class Boss : MonoBehaviour
 
         for (int i = 0; i < count; i++)
         {
-            float spread = count == 1 ? 0f : (i - (count - 1) / 2f) * 0.3f;
+            float spread = count == 1 ? 0f : (i - (count - 1) / 2f) * 0.28f;
             Vector2 direction = new Vector2(aim.x, aim.y + spread);
 
             Projectile fireball = Instantiate(fireballPrefab, mouth, Quaternion.identity);
-            fireball.Launch(direction, phaseTwo ? 7f : 6f);
+            fireball.Launch(direction, phaseTwo ? 7.5f : 6.2f);
         }
 
+        PulseScale(0.92f, 1.08f);
         Sfx.Play(ChiptuneSynth.BossFire);
-
-        yield return new WaitForSeconds(0.35f);
-        attacking = false;
     }
 
     private IEnumerator SlamAttack()
     {
+        // crouch wind-up before leaping
+        targetVelocityX = 0f;
+        PulseScale(1.22f, 0.78f);
+        yield return new WaitForSeconds(0.2f);
+
         // leap towards Mario
-        velocity.y = 14f;
-        velocity.x = player != null ? Mathf.Sign(player.position.x - transform.position.x) * walkSpeed * 1.5f : 0f;
+        PulseScale(0.84f, 1.2f);
+        velocity.y = 14.5f;
+        float leapSpeed = player != null ? Mathf.Clamp((player.position.x - transform.position.x) * 1.1f, -walkSpeed * 2.2f, walkSpeed * 2.2f) : 0f;
+        velocity.x = leapSpeed;
+        targetVelocityX = leapSpeed;
 
         yield return new WaitForSeconds(0.2f);
         yield return new WaitUntil(() => grounded || dead);
 
+        targetVelocityX = 0f;
         velocity.x = 0f;
 
         if (dead) {
             yield break;
         }
 
+        PulseScale(1.26f, 0.74f);
         Sfx.Play(ChiptuneSynth.Slam);
         ShakeCamera(0.35f, 0.25f);
 
@@ -240,10 +440,10 @@ public class Boss : MonoBehaviour
         foreach (float side in new[] { -1f, 1f })
         {
             Projectile wave = Instantiate(shockwavePrefab, floor + Vector3.right * side * 1.2f, Quaternion.identity);
-            wave.Launch(new Vector2(side, 0f), 6.5f);
+            wave.Launch(new Vector2(side, 0f), 6.8f);
         }
 
-        yield return new WaitForSeconds(0.6f);
+        yield return new WaitForSeconds(0.5f);
     }
 
     // damage
@@ -303,8 +503,11 @@ public class Boss : MonoBehaviour
         }
         else
         {
-            // knock back away from Mario
-            velocity.y = 6f;
+            // squash and recoil away from Mario instead of jumping up into him
+            PulseScale(1.25f, 0.72f);
+            float pushDir = player != null ? Mathf.Sign(transform.position.x - player.position.x) : -facing;
+            velocity.x = pushDir * 5f;
+            velocity.y = 3f;
         }
     }
 

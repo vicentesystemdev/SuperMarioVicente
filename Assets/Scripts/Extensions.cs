@@ -14,8 +14,9 @@ public static class Extensions
             return false;
         }
 
-        float radius = 0.25f;
-        float distance = 0.375f;
+        bool vertical = Mathf.Abs(direction.y) > Mathf.Abs(direction.x);
+        float radius = vertical ? 0.35f : 0.25f;
+        float distance = vertical ? 0.3f : 0.375f;
 
         RaycastHit2D hit = Physics2D.CircleCast(rigidbody.position, radius, direction.normalized, distance, layerMask);
         return hit.collider != null && hit.rigidbody != rigidbody;
